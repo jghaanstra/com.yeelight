@@ -1,0 +1,28 @@
+{
+  "name": "com.yeelight",
+  "version": "1.0.0",
+  "description": "Homey app for controlling Yeelights",
+  "main": "app.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jghaanstra/com.yeelight.git"
+  },
+  "keywords": [
+    "yeelight"
+  ],
+  "author": "Jelger Haanstra",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jghaanstra/com.yeelight/issues"
+  },
+  "homepage": "https://github.com/jghaanstra/com.yeelight#readme",
+  "dependencies": {
+    "tinycolor2": "^1.4.1"
+  }
+}

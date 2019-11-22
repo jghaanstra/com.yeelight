@@ -1,0 +1,381 @@
+{
+	"id": "com.yeelight",
+  "sdk": 2,
+  "brandColor": "#df2730",
+	"name": {
+		"en": "Yeelights",
+		"nl": "Yeelights"
+  },
+  "tags": {
+		"en": [ "yeelight", "yeelights" ],
+		"nl": [ "yeelight", "yeelights" ]
+	},
+	"version": "1.0.0",
+	"compatibility": ">=3.0.0",
+	"author": {
+		"name": "Jelger Haanstra",
+		"email": "homey@solidewebservices.com"
+	},
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "jghaanstra"
+      }
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/jghaanstra/com.yeelight/issues"
+  },
+  "homeyCommunityTopicId": 21134,
+  "source": "https://github.com/jghaanstra/com.yeelight",
+  "homepage": "https://community.athom.com/t/21134",
+  "images": {
+    "large": "./assets/images/large.jpg",
+    "small": "./assets/images/small.jpg"
+  },
+	"category": "lights",
+	"description": {
+		"en": "Control Yeelights using Homey",
+		"nl": "Bedien Yeelights via Homey"
+	},
+	"dependencies": {
+		"net": "*"
+	},
+	"capabilities": {
+		"night_mode": {
+			"type": "boolean",
+			"title": {
+				"en": "Night Mode",
+        "nl": "Nacht modus"
+			},
+			"getable": true,
+			"setable": true
+		}
+	},
+	"drivers": [
+    {
+			"id": "yeelight",
+			"name": {
+				"en": "Yeelights",
+				"nl": "Yeelights"
+			},
+			"images": {
+				"large": "drivers/yeelight/assets/images/large.jpg",
+				"small": "drivers/yeelight/assets/images/small.jpg"
+			},
+			"class": "light",
+      "capabilities": [
+        "onoff",
+        "dim",
+        "light_temperature",
+        "light_hue",
+        "light_saturation",
+        "light_mode"
+      ],
+      "capabilitiesOptions": {
+				"dim": {
+					"opts": {
+						"duration": true
+					}
+				}
+			},
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_yeelights"
+          }
+        },
+        {
+          "id": "add_yeelights",
+          "template": "add_devices"
+        }
+      ]
+		}
+	],
+	"flow": {
+    "conditions": [
+      {
+				"id": "yeelightNightmode",
+				"title": {
+          "en": "Night Mode !{{is|is not}} on",
+          "nl": "Nacht modus !{{is|is niet}} aan"
+				},
+				"args": [
+					{
+						"name": "device",
+						"type": "device",
+						"placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelights&capabilities=night_mode"
+					}
+				]
+			}
+    ],
+		"actions": [
+      {
+				"id": "yeelightDefault",
+				"title": {
+					"en": "Set default on state",
+					"nl": "Stel standaard opstart status in"
+				},
+        "hint": {
+					"en": "Use this card to save the current state as the default on state of your Yeelight",
+					"nl": "Gebruik deze actie om de huidige status op te slaan als de standaard aan status van je Yeelight"
+				},
+				"args": [
+          {
+						"name": "device",
+						"type": "device",
+            "placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelights"
+          }
+				]
+			},
+      {
+				"id": "yeelightFlowBrightness",
+				"title": {
+					"en": "Change brightness over time",
+					"nl": "Wijzig helderheid over tijd"
+				},
+        "hint": {
+					"en": "Use this card to create a changing effect of temperature and brightness over time (duration in milliseconds, temperature in Kelvin 1700-6500 and brightness in percentage)",
+					"nl": "Gebruik deze actie voor een veranderd effect van licht temperatuur en helderheid over tijd (doorlooptijd in milliseconden, temperatuur in Kelvin 1700-6500 en helderheid in percentage)"
+				},
+				"args": [
+          {
+						"name": "action",
+						"type": "dropdown",
+            "placeholder": {
+              "en": "Finish action",
+              "nl": "Afrondactie"
+            },
+            "values": [
+              {
+                "id": "0",
+                "label": {
+                  "en": "Recover to previous state",
+                  "nl": "Terug naar oorspronkelijke staat"
+                }
+              },
+              {
+                "id": "1",
+                "label": {
+                  "en": "Stay at the state",
+                  "nl": "Behoud staat"
+                }
+              },
+              {
+                "id": "2",
+                "label": {
+                  "en": "Turn off light",
+                  "nl": "Licht uit"
+                }
+              }
+            ]
+          },
+          {
+						"name": "duration",
+						"type": "number",
+            "placeholder": {
+              "en": "Duration in milliseconds",
+              "nl": "Doorlooptijd in milliseconden"
+            },
+            "min": 50,
+            "step": 1
+          },
+          {
+						"name": "temperature",
+						"type": "number",
+            "placeholder": {
+              "en": "Temperature",
+              "nl": "Temperatuur"
+            },
+            "min": 1700,
+            "max": 6500,
+            "step": 1
+          },
+          {
+						"name": "brightness",
+						"type": "number",
+            "placeholder": {
+              "en": "Brightness",
+              "nl": "Helderheid"
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+						"name": "device",
+						"type": "device",
+            "placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelights"
+          }
+				]
+			},
+      {
+				"id": "yeelightTemperatureScene",
+				"title": {
+					"en": "Temperature and brightness",
+					"nl": "Temperatuur en helderheid"
+				},
+        "hint": {
+					"en": "Use this card to set the temperature and brightness directly (temperature in Kelvin 1700-6500 and brightness in percentage)",
+					"nl": "Gebruik deze actie om de temperatuur en helderheid direct in te stellen (temperatuur in Kelvin 1700-6500 en helderheid in percentage)"
+				},
+				"args": [
+          {
+						"name": "temperature",
+						"type": "number",
+            "placeholder": {
+              "en": "Temperature",
+              "nl": "Temperatuur"
+            },
+            "min": 1700,
+            "max": 6500,
+            "step": 1
+          },
+          {
+						"name": "brightness",
+						"type": "number",
+            "placeholder": {
+              "en": "Brightness",
+              "nl": "Helderheid"
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+						"name": "device",
+						"type": "device",
+            "placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelights"
+          }
+				]
+			},
+      {
+				"id": "yeelightColorScene",
+				"title": {
+					"en": "Color and brightness",
+					"nl": "Kleur en helderheid"
+				},
+        "hint": {
+					"en": "Use this card to set the color and brightness directly (brightness in percentage)",
+					"nl": "Gebruik deze actie om de kleur en helderheid direct in te stellen (helderheid in percentage)"
+				},
+				"args": [
+          {
+						"name": "color",
+						"type": "color"
+          },
+          {
+						"name": "brightness",
+						"type": "number",
+            "placeholder": {
+              "en": "Brightness",
+              "nl": "Helderheid"
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1
+          },
+          {
+						"name": "device",
+						"type": "device",
+            "placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelights"
+          }
+				]
+			},
+      {
+				"id": "yeelightCustomCommand",
+				"title": {
+					"en": "Send command (advanced)",
+					"nl": "Verstuur commando (geadvanceerd)"
+				},
+        "hint": {
+					"en": "Advanced users can use this card to send any custom command, see the Yeelight documentation for options",
+					"nl": "Geadvanceerde gebruikers kunnen deze actie gebruiken om maatwerk commands te versturen, zie de Yeelight documentatie voor opties"
+				},
+				"args": [
+          {
+						"name": "command",
+						"type": "text",
+            "placeholder": {
+              "en": "Custom command",
+              "nl": "Aangepast commando"
+            }
+          },
+          {
+						"name": "device",
+						"type": "device",
+            "placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelights"
+          }
+				]
+			},
+			{
+				"id": "yeelightNightMode",
+				"title": {
+					"en": "Toggle Night Mode",
+					"nl": "Schakel nacht modus"
+				},
+				"hint": {
+					"en": "Use this card to switch the light between night mode and normal mode",
+					"nl": "Gebruik deze actie om de lamp tussen nacht modus en gewone modus te schakelen"
+				},
+				"args": [
+					{
+						"name": "mode",
+						"type": "dropdown",
+						"values": [
+							{
+								"id": "normal",
+								"label": {
+									"en": "Normal Mode",
+									"nl": "Normale modus"
+								}
+							},
+							{
+								"id": "night",
+								"label": {
+									"en": "Night Mode",
+									"nl": "Nacht modus"
+								}
+							}
+						]
+					},
+					{
+						"name": "device",
+						"type": "device",
+						"placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelights&capabilities=night_mode"
+					}
+				]
+			}
+		]
+	}
+}
