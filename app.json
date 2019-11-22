@@ -10,7 +10,7 @@
 		"en": [ "yeelight", "yeelights" ],
 		"nl": [ "yeelight", "yeelights" ]
 	},
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"compatibility": ">=3.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
@@ -110,7 +110,7 @@
 							"en": "Select Yeelight",
 							"nl": "Selecteer Yeelight"
 						},
-						"filter": "driver_id=yeelights&capabilities=night_mode"
+						"filter": "driver_id=yeelight&capabilities=night_mode"
 					}
 				]
 			}
@@ -134,7 +134,7 @@
 							"en": "Select Yeelight",
 							"nl": "Selecteer Yeelight"
 						},
-						"filter": "driver_id=yeelights"
+						"filter": "driver_id=yeelight"
           }
 				]
 			},
@@ -219,7 +219,7 @@
 							"en": "Select Yeelight",
 							"nl": "Selecteer Yeelight"
 						},
-						"filter": "driver_id=yeelights"
+						"filter": "driver_id=yeelight"
           }
 				]
 			},
@@ -263,7 +263,7 @@
 							"en": "Select Yeelight",
 							"nl": "Selecteer Yeelight"
 						},
-						"filter": "driver_id=yeelights"
+						"filter": "driver_id=yeelight"
           }
 				]
 			},
@@ -300,7 +300,7 @@
 							"en": "Select Yeelight",
 							"nl": "Selecteer Yeelight"
 						},
-						"filter": "driver_id=yeelights"
+						"filter": "driver_id=yeelight"
           }
 				]
 			},
@@ -330,7 +330,7 @@
 							"en": "Select Yeelight",
 							"nl": "Selecteer Yeelight"
 						},
-						"filter": "driver_id=yeelights"
+						"filter": "driver_id=yeelight"
           }
 				]
 			},
@@ -372,7 +372,7 @@
 							"en": "Select Yeelight",
 							"nl": "Selecteer Yeelight"
 						},
-						"filter": "driver_id=yeelights&capabilities=night_mode"
+						"filter": "driver_id=yeelight&capabilities=night_mode"
 					}
 				]
 			}
