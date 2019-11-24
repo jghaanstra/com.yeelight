@@ -48,6 +48,10 @@ class YeelightDriver extends Homey.Driver {
   onInit() {
     // listen to updates when devices come online and on regular interval to pick up IP address changes. Also allow discover message to be send and discover results to be received
     util.listenUpdates();
+
+    // update the list of added devices initially and on a frequent interval
+    util.fillAddedDevices();
+    this.updateEventsInterval = setInterval(function() { util.fillAddedDevices() }, 300000);
   }
 
   async onPairListDevices (data, callback) {

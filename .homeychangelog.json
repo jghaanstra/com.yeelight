@@ -4,5 +4,8 @@
   },
   "1.0.1": {
     "en": "Initial version of a standalone app for Yeelights. Please migrate your devices from the Xiaomi Mi Home app to this dedicated Yeelights app."
+  },
+  "1.0.2": {
+    "en": "Fix for Yeelights that have been online and come online again."
   }
 }

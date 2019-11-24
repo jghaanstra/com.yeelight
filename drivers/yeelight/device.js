@@ -149,7 +149,7 @@ class YeelightDevice extends Homey.Device {
         yeelights[id].connecting = true;
         yeelights[id].socket = new net.Socket();
         yeelights[id].socket.connect(device.getSetting('port'), device.getSetting('address'), function() {
-          yeelights[id].socket.setKeepAlive(true, 10000);
+          yeelights[id].socket.setKeepAlive(true, 5000);
           yeelights[id].socket.setTimeout(0);
         });
       } else {
@@ -173,6 +173,7 @@ class YeelightDevice extends Homey.Device {
 
     yeelights[id].socket.on('error', (error) => {
       this.log("Yeelight - error on socket: "+ error);
+      yeelights[id].connected = false;
 
       if (yeelights[id].socket) {
         yeelights[id].socket.destroy();
