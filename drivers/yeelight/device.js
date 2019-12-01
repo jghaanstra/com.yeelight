@@ -134,6 +134,9 @@ class YeelightDevice extends Homey.Device {
 
   onDeleted() {
     let id = this.getData().id;
+    if (yeelights[id].socket) {
+      yeelights[id].socket.destroy();
+    }
     delete yeelights[id];
   }
 
@@ -201,10 +204,12 @@ class YeelightDevice extends Homey.Device {
     });
 
     yeelights[id].socket.on('data', (message, address) => {
-      clearTimeout(yeelights[id].timeout);
-      clearTimeout(yeelights[id].reconnect);
-      yeelights[id].reconnect = null;
-
+      if (typeof yeelights[id] !== "undefined") {
+        clearTimeout(yeelights[id].timeout);
+        clearTimeout(yeelights[id].reconnect);
+        yeelights[id].reconnect = null;
+      }
+      
       if(!device.getAvailable()) {
         device.setAvailable();
       }

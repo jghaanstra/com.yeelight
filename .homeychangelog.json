@@ -7,5 +7,8 @@
   },
   "1.0.2": {
     "en": "Fix for Yeelights that have been online and come online again."
+  },
+  "1.0.3": {
+    "en": "Small fixes to improve pairing process and avoid crashes when removing Yeelight devices."
   }
 }
