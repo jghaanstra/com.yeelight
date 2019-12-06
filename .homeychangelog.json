@@ -10,5 +10,8 @@
   },
   "1.0.3": {
     "en": "Small fixes to improve pairing process and avoid crashes when removing Yeelight devices."
+  },
+  "1.0.4": {
+    "en": "Small improvements to avoid offline devices in certain cases like temporary unreachable devices due to bad WiFi."
   }
 }

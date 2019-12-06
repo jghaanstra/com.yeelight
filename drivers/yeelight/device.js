@@ -142,9 +142,8 @@ class YeelightDevice extends Homey.Device {
 
   // HELPER FUNCTIONS
 
-  /* establish socket with online devices and update state upon connect  */
+  /* establish socket with online devices and update state upon connect */
   createDeviceSocket(id) {
-
     let device = Homey.ManagerDrivers.getDriver('yeelight').getDevice(yeelights[id].data);
 
     try {
@@ -165,8 +164,12 @@ class YeelightDevice extends Homey.Device {
     yeelights[id].socket.on('connect', () => {
       yeelights[id].connecting = false;
       yeelights[id].connected = true;
-      device.setAvailable();
 
+      if (!device.getAvailable()) {
+        device.setAvailable();
+      }
+
+      /* get current light status 4 seconds after connection */
       setTimeout(() => {
         if (yeelights[id].socket !== null) {
           yeelights[id].socket.write('{"id":1,"method":"get_prop","params":["power", "bright", "color_mode", "ct", "rgb", "hue", "sat"]}' + '\r\n');
@@ -175,24 +178,28 @@ class YeelightDevice extends Homey.Device {
     });
 
     yeelights[id].socket.on('error', (error) => {
-      this.log("Yeelight - error on socket: "+ error);
+      this.log("Yeelight - socket error: "+ error);
       yeelights[id].connected = false;
 
       if (yeelights[id].socket) {
         yeelights[id].socket.destroy();
       }
 
-      if(error.code === 'ETIMEDOUT' || error.code === 'ECONNRESET' || error == 'Error: Error sending command') {
-        this.log('Yeelight - trying to reconnect in 6 seconds.');
+      if (error.code === 'ETIMEDOUT' || error.code === 'ECONNRESET' || error == 'Error: Error sending command') {
+        this.log("Yeelight - trying to reconnect in 6 seconds.");
+        var time2retry = 6000;
+      } else {
+        this.log("Yeelight - trying to reconnect in 60 seconds.");
+        var time2retry = 60000;
+      }
 
-        if (yeelights[id].reconnect === null) {
-          yeelights[id].reconnect = setTimeout(() => {
-            if (yeelights[id].connected === false && yeelights[id].connected === false) {
-              this.createDeviceSocket(id);
-            }
-            yeelights[id].reconnect = null;
-          }, 6000);
-        }
+      if (yeelights[id].reconnect === null) {
+        yeelights[id].reconnect = setTimeout(() => {
+          if (yeelights[id].connecting === false && yeelights[id].connected === false) {
+            this.createDeviceSocket(id);
+          }
+          yeelights[id].reconnect = null;
+        }, time2retry);
       }
     });
 
@@ -209,7 +216,7 @@ class YeelightDevice extends Homey.Device {
         clearTimeout(yeelights[id].reconnect);
         yeelights[id].reconnect = null;
       }
-      
+
       if(!device.getAvailable()) {
         device.setAvailable();
       }
