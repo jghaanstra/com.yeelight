@@ -71,7 +71,7 @@ class YeelightDriver extends Homey.Driver {
             var model = 'bslamp';
           }
         } else if (result[i].model.startsWith('ceiling')) {
-          if (result[i].model !== 'ceiling' || result[i].model == 'ceiling1' || result[i].model == 'ceiling2' || result[i].model == 'ceiling3') {
+          if (result[i].model == 'ceiling' || result[i].model == 'ceiling1' || result[i].model == 'ceiling2' || result[i].model == 'ceiling3') {
             var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling';
           } else if (result[i].model == 'ceiling4') {

@@ -13,5 +13,8 @@
   },
   "1.0.4": {
     "en": "Small improvements to avoid offline devices in certain cases like temporary unreachable devices due to bad WiFi."
+  },
+  "1.0.5": {
+    "en": "Fixed a bug where certain ceiling lights (ceiling4 and ceiling10) did not get the right capabilities during pairing. Please re-pair if you are missing color settings."
   }
 }
