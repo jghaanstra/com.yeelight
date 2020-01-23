@@ -30,6 +30,7 @@ class YeelightDevice extends Homey.Device {
     });
 
     this.registerCapabilityListener('dim', async (value, opts) => {
+      console.log(value);
       let brightness = value === 0 ? 1 : value * 100;
       // Logic which will toggle between night_mode and normal_mode when brightness is set to 0 or 100 two times within 5 seconds
       if (this.hasCapability('night_mode') && opts.duration === undefined) {
@@ -59,9 +60,13 @@ class YeelightDevice extends Homey.Device {
         }
       }
 
+      if (opts.duration === undefined || typeof opts.duration == 'undefined') {
+        opts.duration = '500';
+      }
+
       if (value === 0 && !this.hasCapability('night_mode')) {
         return this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["off", "smooth", 500]}');
-      } else if (value === 0 && typeof opts.duration !== 'undefined') {
+      } else if (value === 0) {
         if (this.getData().model == 'ceiling4') {
           var color_temp = util.denormalize(this.getCapabilityValue('light_temperature'), 2700, 6000);
         } else if (this.getData().model == 'color') {
@@ -70,10 +75,8 @@ class YeelightDevice extends Homey.Device {
           var color_temp = util.denormalize(this.getCapabilityValue('light_temperature'), 2700, 6500);
         }
         return this.sendCommand(this.getData().id, '{"id":1,"method":"start_cf","params":[1, 2, "'+ opts.duration +', 2, '+ color_temp +', 0"]}');
-      } else if (typeof opts.duration !== 'undefined') {
-        return this.sendCommand(this.getData().id, '{"id":1,"method":"set_bright","params":['+ brightness +', "smooth", '+ opts.duration +']}');
       } else {
-        return this.sendCommand(this.getData().id, '{"id":1,"method":"set_bright","params":['+ brightness +', "smooth", 500]}');
+        return this.sendCommand(this.getData().id, '{"id":1,"method":"set_bright","params":['+ brightness +', "smooth", '+ opts.duration +']}');
       }
     });
 

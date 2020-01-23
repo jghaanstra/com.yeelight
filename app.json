@@ -10,7 +10,7 @@
 		"en": [ "yeelight", "yeelights" ],
 		"nl": [ "yeelight", "yeelights" ]
 	},
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"compatibility": ">=3.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
