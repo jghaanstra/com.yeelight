@@ -58,6 +58,30 @@ class YeelightApp extends Homey.App {
         return args.device.triggerCapabilityListener('night_mode', night_mode);
       })
 
+    new Homey.FlowCardAction('yeelightAmbilightSwitch')
+      .register()
+      .registerRunListener((args, state) => {
+        if (args.switch == 'on') {
+          var switch_bg = true;
+        } else {
+          var switch_bg = false;
+        }
+        return args.device.triggerCapabilityListener('onoff.bg', switch_bg);
+      })
+
+    new Homey.FlowCardAction('yeelightAmbilightDim')
+      .register()
+      .registerRunListener((args, state, opts) => {
+        var duration_bg = args.duration_bg * 1000;
+        return args.device.triggerCapabilityListener('dim.bg', args.brightness, {'duration': duration_bg});
+      })
+
+    new Homey.FlowCardAction('yeelightAmbilightTemperature')
+      .register()
+      .registerRunListener((args, state) => {
+        return args.device.triggerCapabilityListener('light_temperature.bg', args.temperature);
+      })
+
   }
 }
 

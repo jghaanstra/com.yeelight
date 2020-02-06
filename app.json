@@ -10,7 +10,7 @@
 		"en": [ "yeelight", "yeelights" ],
 		"nl": [ "yeelight", "yeelights" ]
 	},
-	"version": "1.0.6",
+	"version": "1.1.0",
 	"compatibility": ">=3.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
@@ -66,16 +66,49 @@
 			"class": "light",
       "capabilities": [
         "onoff",
+        "onoff.bg",
         "dim",
+        "dim.bg",
         "light_temperature",
+        "light_temperature.bg",
         "light_hue",
         "light_saturation",
-        "light_mode"
+        "light_mode",
+        "light_mode.bg"
       ],
       "capabilitiesOptions": {
 				"dim": {
 					"opts": {
 						"duration": true
+					}
+				},
+        "dim.bg": {
+					"opts": {
+						"duration": true
+					}
+				},
+        "onoff.bg": {
+					"title": {
+						"en": "Switch ambilight",
+						"nl": "Schakel ambilight"
+					}
+				},
+        "dim.bg": {
+					"title": {
+						"en": "Dim ambilight",
+						"nl": "Dim ambilight"
+					}
+				},
+        "light_mode.bg": {
+					"title": {
+						"en": "Light mode ambilight",
+						"nl": "Licht modus ambilight"
+					}
+				},
+        "light_temperature.bg": {
+					"title": {
+						"en": "Temperature ambilight",
+						"nl": "Temperatuur ambilight"
 					}
 				}
 			},
@@ -373,6 +406,123 @@
 							"nl": "Selecteer Yeelight"
 						},
 						"filter": "driver_id=yeelight&capabilities=night_mode"
+					}
+				]
+			},
+      {
+				"id": "yeelightAmbilightSwitch",
+				"title": {
+					"en": "Switch ambilight",
+					"nl": "Schakel ambilight"
+				},
+				"hint": {
+					"en": "Use this card to switch the ambilight on or off.",
+					"nl": "Gebruik deze actie om de ambilight van de de lamp te schakelen."
+				},
+				"args": [
+					{
+						"name": "switch",
+						"type": "dropdown",
+						"values": [
+							{
+								"id": "on",
+								"label": {
+									"en": "On",
+									"nl": "Aan"
+								}
+							},
+							{
+								"id": "off",
+								"label": {
+									"en": "Off",
+									"nl": "Uit"
+								}
+							}
+						]
+					},
+					{
+						"name": "device",
+						"type": "device",
+						"placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelight&capabilities=onoff.bg"
+					}
+				]
+			},
+      {
+				"id": "yeelightAmbilightDim",
+				"title": {
+					"en": "Dim ambilight",
+					"nl": "Dim ambilight"
+				},
+				"hint": {
+					"en": "Use this card to dim the ambilight and the duration for dimming in seconds.",
+					"nl": "Gebruik deze actie om de ambilight van de de lamp te dimmen met de ingestelde duur in seconden."
+				},
+				"args": [
+					{
+						"name": "brightness",
+						"type": "range",
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "label": "%",
+            "labelMultiplier": 100,
+            "labelDecimals": 0
+					},
+          {
+						"name": "duration_bg",
+						"type": "number",
+            "min": 0,
+            "max": 3600,
+            "step": 1,
+            "placeholder": {
+              "en": "Duration in seconds",
+              "nl": "Duur in seconden"
+            }
+					},
+					{
+						"name": "device",
+						"type": "device",
+						"placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelight&capabilities=dim.bg"
+					}
+				]
+			},
+      {
+				"id": "yeelightAmbilightTemperature",
+				"title": {
+					"en": "Temperature ambilight",
+					"nl": "Temperature ambilight"
+				},
+				"hint": {
+					"en": "Use this card to set the temperature of the ambilight. A higher value is a warmer temperature.",
+					"nl": "Gebruik deze actie om de temperatuur van de ambilight in te stellen. Een hogere waarde is een warmere temperatuur."
+				},
+				"args": [
+					{
+						"name": "temperature",
+						"type": "range",
+            "min": 0,
+            "max": 1,
+            "step": 0.01,
+            "label": "%",
+            "labelMultiplier": 100,
+            "labelDecimals": 0
+					},
+					{
+						"name": "device",
+						"type": "device",
+						"placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelight&capabilities=light_temperature.bg"
 					}
 				]
 			}

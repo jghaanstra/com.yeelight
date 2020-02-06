@@ -11,9 +11,9 @@ const typeCapabilityMap = {
   'bslamp'    : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'bslamp2'   : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'ceiling'   : [ 'onoff', 'dim', 'light_temperature', 'light_mode', 'night_mode' ],
-  'ceiling4'  : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode', 'night_mode' ],
-  'ceiling5+' : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode', 'night_mode' ],
-  'ceiling10' : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode', 'night_mode' ],
+  'ceiling4'  : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
+  'ceiling5+' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
+  'ceiling10' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
   'desklamp'  : [ 'onoff', 'dim', 'light_temperature', 'light_mode' ]
 }
 

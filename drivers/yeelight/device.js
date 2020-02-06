@@ -18,6 +18,22 @@ class YeelightDevice extends Homey.Device {
     yeelights[id].connecting = false;
     yeelights[id].connected = false;
 
+    // ADD NEW CAPABILITIES
+    if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling5+' || this.getData().model == 'ceiling10') {
+      if (!this.hasCapability('onoff.bg')) {
+        this.addCapability('onoff.bg');
+      }
+      if (!this.hasCapability('dim.bg')) {
+        this.addCapability('dim.bg');
+      }
+      if (!this.hasCapability('light_mode.bg')) {
+        this.addCapability('light_mode.bg');
+      }
+      if (!this.hasCapability('light_temperature.bg')) {
+        this.addCapability('light_temperature.bg');
+      }
+    }
+
     this.createDeviceSocket(id);
 
     // LISTENERS FOR UPDATING CAPABILITIES
@@ -29,8 +45,15 @@ class YeelightDevice extends Homey.Device {
       }
     });
 
+    this.registerCapabilityListener('onoff.bg', (value, opts) => {
+      if (value) {
+        return this.sendCommand(this.getData().id, '{"id": 1, "method": "bg_set_power", "params":["on", "smooth", 500]}');
+      } else {
+        return this.sendCommand(this.getData().id, '{"id": 1, "method": "bg_set_power", "params":["off", "smooth", 500]}');
+      }
+    });
+
     this.registerCapabilityListener('dim', async (value, opts) => {
-      console.log(value);
       let brightness = value === 0 ? 1 : value * 100;
       // Logic which will toggle between night_mode and normal_mode when brightness is set to 0 or 100 two times within 5 seconds
       if (this.hasCapability('night_mode') && opts.duration === undefined) {
@@ -78,6 +101,14 @@ class YeelightDevice extends Homey.Device {
       } else {
         return this.sendCommand(this.getData().id, '{"id":1,"method":"set_bright","params":['+ brightness +', "smooth", '+ opts.duration +']}');
       }
+    });
+
+    this.registerCapabilityListener('dim.bg', async (value, opts) => {
+      if (opts.duration === undefined || typeof opts.duration == 'undefined') {
+        opts.duration = '500';
+      }
+      let brightness = value === 0 ? 1 : value * 100;
+      return this.sendCommand(this.getData().id, '{"id":1,"method":"bg_set_bright","params":['+ brightness +', "smooth", '+ opts.duration +']}');
     });
 
     this.registerCapabilityListener('night_mode', (value, opts) => {
@@ -131,6 +162,15 @@ class YeelightDevice extends Homey.Device {
         this.setCapabilityValue('night_mode', false);
       }
       return this.sendCommand(this.getData().id, '{"id":1,"method":"set_ct_abx","params":['+ color_temp +', "smooth", 500]}');
+    });
+
+    this.registerCapabilityListener('light_temperature.bg', (value, opts) => {
+      if (!this.getCapabilityValue('onoff.bg')) {
+        this.setCapabilityValue('onoff.bg', true);
+      }
+
+      var color_temp = util.denormalize(value, 2700, 6500);
+      return this.sendCommand(this.getData().id, '{"id":1,"method":"bg_set_ct_abx","params":['+ color_temp +', "smooth", 500]}');
     });
 
   }
@@ -240,10 +280,23 @@ class YeelightDevice extends Homey.Device {
                 device.setCapabilityValue('onoff', false);
               }
               break;
+            case 'bg_power':
+              if(result.params.bg_power == 'on' && device.getCapabilityValue('onoff.bg') == false) {
+                device.setCapabilityValue('onoff.bg', true);
+              } else if (result.params.bg_power == 'off' && device.getCapabilityValue('onoff.bg') == true) {
+                device.setCapabilityValue('onoff.bg', false);
+              }
+              break;
             case 'bright':
               var dim = result.params.bright / 100;
               if (device.getCapabilityValue('dim') != dim) {
                 device.setCapabilityValue('dim', dim);
+              }
+              break;
+            case 'bg_bright':
+              var dim_bg = result.params.bg_bright / 100;
+              if (device.getCapabilityValue('dim.bg') != dim_bg) {
+                device.setCapabilityValue('dim.bg', dim_bg);
               }
               break;
             case 'ct':
@@ -257,6 +310,14 @@ class YeelightDevice extends Homey.Device {
               if (device.hasCapability('light_temperature')) {
                 if (device.getCapabilityValue('light_temperature') != color_temp) {
                   device.setCapabilityValue('light_temperature', color_temp);
+                }
+              }
+              break;
+            case 'bg_ct':
+              var color_temp = util.normalize(result.params.bg_ct, 2700, 6500);
+              if (device.hasCapability('light_temperature.bg')) {
+                if (device.getCapabilityValue('light_temperature.bg') != color_temp) {
+                  device.setCapabilityValue('light_temperature.bg', color_temp);
                 }
               }
               break;
@@ -296,6 +357,15 @@ class YeelightDevice extends Homey.Device {
                   device.setCapabilityValue('light_mode', 'temperature');
                 } else {
                   device.setCapabilityValue('light_mode', 'color');
+                }
+              }
+              break;
+            case 'bg_lmode':
+              if (device.hasCapability('light_mode.bg')) {
+                if (result.params.bg_lmode == 2) {
+                  device.setCapabilityValue('light_mode.bg', 'temperature');
+                } else {
+                  device.setCapabilityValue('light_mode.bg', 'color');
                 }
               }
               break;

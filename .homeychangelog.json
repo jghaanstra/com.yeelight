@@ -16,5 +16,8 @@
   },
   "1.0.5": {
     "en": "Fixed a bug where certain ceiling lights (ceiling4 and ceiling10) did not get the right capabilities during pairing. Please re-pair if you are missing color settings."
+  },
+  "1.1.0": {
+    "en": "Fixed issue with dim duration. Added action cards for onoff, dim and temperature for ambilight (ceiling 650 and meteorite)."
   }
 }
