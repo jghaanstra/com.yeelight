@@ -480,6 +480,83 @@ class YeelightDevice extends Homey.Device {
       return false;
     }
   }
+
+  async saveState(device) {
+    try {
+      let savedState = {
+        "onoff": await device.getCapabilityValue("onoff"),
+        "dim": await device.getCapabilityValue("dim")
+      }
+      if (device.hasCapability("light_temperature")) {
+        savedState.light_temperature = await device.getCapabilityValue("light_temperature");
+      }
+      if (device.hasCapability("light_hue")) {
+        savedState.light_hue = await device.getCapabilityValue("light_hue");
+      }
+      if (device.hasCapability("light_saturation")) {
+        savedState.light_saturation = await device.getCapabilityValue("light_saturation");
+      }
+      if (device.hasCapability("night_mode")) {
+        savedState.night_mode = await device.getCapabilityValue("night_mode");
+      }
+      if (device.hasCapability("onoff.bg")) {
+        savedState.onoff_bg = await device.getCapabilityValue("onoff.bg");
+      }
+      if (device.hasCapability("dim.bg")) {
+        savedState.dim_bg = await device.getCapabilityValue("dim.bg");
+      }
+      if (device.hasCapability("light_temperature.bg")) {
+        savedState.light_temperature_bg = await device.getCapabilityValue("light_temperature.bg");
+      }
+
+      await device.setStoreValue("savedstate", savedState);
+
+      return true;
+    } catch (error) {
+      this.log(error);
+      return false;
+    }
+  }
+
+  async setState(device) {
+    try {
+      let savedState = device.getStoreValue("savedstate");
+
+      if (device.getCapabilityValue("onoff") != savedState.onoff) {
+        device.triggerCapabilityListener("onoff", savedState.onoff);
+      }
+      if (device.getCapabilityValue("dim") != savedState.dim) {
+        device.triggerCapabilityListener("dim", savedState.dim);
+      }
+      if (device.getCapabilityValue("light_temperature") != savedState.light_temperature) {
+        device.triggerCapabilityListener("light_temperature", savedState.light_temperature);
+      }
+      if (device.getCapabilityValue("light_hue") != savedState.light_hue) {
+        device.triggerCapabilityListener("light_hue", savedState.light_hue);
+      }
+      if (device.getCapabilityValue("light_saturation") != savedState.light_saturation) {
+        device.triggerCapabilityListener("light_saturation", savedState.light_saturation);
+      }
+      if (device.getCapabilityValue("night_mode") != savedState.night_mode) {
+        device.triggerCapabilityListener("night_mode", savedState.night_mode);
+      }
+      if (device.getCapabilityValue("onoff.bg") != savedState.onoff_bg) {
+        device.triggerCapabilityListener("onoff.bg", savedState.onoff_bg);
+      }
+      if (device.getCapabilityValue("dim.bg") != savedState.dim_bg) {
+        device.triggerCapabilityListener("dim.bg", savedState.dim_bg);
+      }
+      if (device.getCapabilityValue("light_temperature.bg") != savedState.light_temperature_bg) {
+        device.triggerCapabilityListener("light_temperature.bg", savedState.light_temperature_bg);
+      }
+
+      return true;
+    } catch (error) {
+      this.log(error);
+      return false;
+    }
+  }
+
 }
 
 module.exports = YeelightDevice;

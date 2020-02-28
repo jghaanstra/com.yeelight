@@ -19,5 +19,8 @@
   },
   "1.1.0": {
     "en": "Fixed issue with dim duration. Added action cards for onoff, dim and temperature for ambilight (ceiling 650 and meteorite)."
+  },
+  "1.1.1": {
+    "en": "Added action cards for saving and restoring the state of the light which is usefull for switching between scenes."
   }
 }

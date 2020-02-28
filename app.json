@@ -10,7 +10,7 @@
 		"en": [ "yeelight", "yeelights" ],
 		"nl": [ "yeelight", "yeelights" ]
 	},
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"compatibility": ">=3.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
@@ -523,6 +523,50 @@
 							"nl": "Selecteer Yeelight"
 						},
 						"filter": "driver_id=yeelight&capabilities=light_temperature.bg"
+					}
+				]
+			},
+      {
+				"id": "yeelightSaveState",
+				"title": {
+					"en": "Save current state",
+					"nl": "Opslaan huidige status"
+				},
+				"hint": {
+					"en": "Use this card to save the current state of the light so you can restore it later.",
+					"nl": "Gebruik deze actie om de status van de lamp op te slaan zodat deze later hersteld kan worden."
+				},
+				"args": [
+					{
+						"name": "device",
+						"type": "device",
+						"placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelight"
+					}
+				]
+			},
+      {
+				"id": "yeelightSetState",
+				"title": {
+					"en": "Restore saved state",
+					"nl": "Herstellen opgeslagen status"
+				},
+				"hint": {
+					"en": "Use this card to set the state of the light to the previously saved state.",
+					"nl": "Gebruik deze actie om de status van de lamp in te stellen op de eerder opgeslagen status."
+				},
+				"args": [
+					{
+						"name": "device",
+						"type": "device",
+						"placeholder": {
+							"en": "Select Yeelight",
+							"nl": "Selecteer Yeelight"
+						},
+						"filter": "driver_id=yeelight"
 					}
 				]
 			}

@@ -82,6 +82,18 @@ class YeelightApp extends Homey.App {
         return args.device.triggerCapabilityListener('light_temperature.bg', args.temperature);
       })
 
+    new Homey.FlowCardAction('yeelightSaveState')
+      .register()
+      .registerRunListener((args, state) => {
+        return args.device.saveState(args.device);
+      })
+
+    new Homey.FlowCardAction('yeelightSetState')
+      .register()
+      .registerRunListener((args, state) => {
+        return args.device.setState(args.device);
+      })
+
   }
 }
 
