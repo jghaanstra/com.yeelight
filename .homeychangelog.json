@@ -22,5 +22,8 @@
   },
   "1.1.1": {
     "en": "Added action cards for saving and restoring the state of the light which is usefull for switching between scenes."
+  },
+  "1.1.2": {
+    "en": "Add support for YLXD42YL (ceiling15)."
   }
 }

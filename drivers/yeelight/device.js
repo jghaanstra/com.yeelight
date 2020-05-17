@@ -90,7 +90,7 @@ class YeelightDevice extends Homey.Device {
       if (value === 0 && !this.hasCapability('night_mode')) {
         return this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["off", "smooth", 500]}');
       } else if (value === 0) {
-        if (this.getData().model == 'ceiling4') {
+        if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling15' ) {
           var color_temp = util.denormalize(this.getCapabilityValue('light_temperature'), 2700, 6000);
         } else if (this.getData().model == 'color') {
           var color_temp = util.denormalize(this.getCapabilityValue('light_temperature'), 1700, 6500);
@@ -151,7 +151,7 @@ class YeelightDevice extends Homey.Device {
         this.setCapabilityValue('onoff', true);
       }
 
-      if (this.getData().model == 'ceiling4') {
+      if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling15') {
         var color_temp = util.denormalize(value, 2700, 6000);
       } else if (this.getData().model == 'color') {
         var color_temp = util.denormalize(value, 1700, 6500);

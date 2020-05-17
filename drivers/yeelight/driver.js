@@ -14,6 +14,7 @@ const typeCapabilityMap = {
   'ceiling4'  : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
   'ceiling5+' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
   'ceiling10' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
+  'ceiling15' : [ 'onoff', 'dim', 'light_temperature', 'light_mode', 'night_mode' ],
   'desklamp'  : [ 'onoff', 'dim', 'light_temperature', 'light_mode' ]
 }
 
@@ -28,6 +29,7 @@ const typeIconMap = {
   'ceiling4'  : 'ceiling4.svg',
   'ceiling5+'  : 'ceiling.svg',
   'ceiling10' : 'ceiling10.svg',
+  'ceiling15' : 'ceiling4.svg',
   'desklamp'  : 'desklamp.svg'
 }
 
@@ -83,6 +85,12 @@ class YeelightDriver extends Homey.Driver {
           } else if (result[i].model == 'ceiling10') {
             var name = Homey.__('yeelight_meteorite_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling10';
+          } else if (result[i].model == 'ceiling15') {
+            var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
+            var model = 'ceiling15';
+          } else {
+            var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
+            var model = 'ceiling';
           }
         } else if (result[i].model == 'desklamp') {
           var name = Homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
