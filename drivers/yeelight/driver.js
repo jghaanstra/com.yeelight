@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 const Homey = require('homey');
-const util = require('/lib/util.js');
+const Util = require('/lib/util.js');
 
 const typeCapabilityMap = {
 	'mono'      : [ 'onoff', 'dim' ],
@@ -36,18 +36,20 @@ const typeIconMap = {
 class YeelightDriver extends Homey.Driver {
 
   onInit() {
+    if (!this.util) this.util = new Util({homey: this.homey});
+
     // listen to updates when devices come online and on regular interval to pick up IP address changes. Also allow discover message to be send and discover results to be received
-    util.listenUpdates();
+    this.util.listenUpdates();
 
     // update the list of added devices initially and on a frequent interval
-    util.fillAddedDevices();
-    this.updateEventsInterval = setInterval(function() { util.fillAddedDevices() }, 300000);
+    this.util.fillAddedDevices();
+    this.updateEventsInterval = setInterval(function() { this.util.fillAddedDevices() }, 300000);
   }
 
-  async onPairListDevices (data, callback) {
+  async onPairListDevices() {
     try {
-      let added_devices = await util.fillAddedDevices();
-      let result = await util.discover();
+      let added_devices = await this.util.fillAddedDevices();
+      let result = await this.util.discover();
       let devices = [];
 
       for (let i in result) {
@@ -55,18 +57,18 @@ class YeelightDriver extends Homey.Driver {
         var model = '';
 
         if(result[i].model.startsWith('color')) {
-          var name = Homey.__('yeelight_bulb_color')+ ' (' + result[i].address + ')';
+          var name = this.homey.__('driver.yeelight_bulb_color')+ ' (' + result[i].address + ')';
           var model = 'color';
         } else if (result[i].model.startsWith('mono')) {
-          var name = Homey.__('yeelight_bulb_white')+ ' (' + result[i].address + ')';
+          var name = this.homey.__('driver.yeelight_bulb_white')+ ' (' + result[i].address + ')';
           var model = 'mono';
         } else if (result[i].model == 'ct') {
-          var name = Homey.__('yeelight_bulb_white_v2')+ ' (' + result[i].address + ')';
+          var name = this.homey.__('driver.yeelight_bulb_white')+ ' (' + result[i].address + ')';
         } else if (result[i].model.startsWith('stripe')) {
-          var name = Homey.__('yeelight_led_strip')+ ' (' + result[i].address + ')';
+          var name = this.homey.__('driver.yeelight_led_strip')+ ' (' + result[i].address + ')';
           var model = 'stripe';
         } else if (result[i].model.startsWith('bslamp')) {
-          var name = Homey.__('yeelight_bedside_lamp')+ ' (' + result[i].address + ')';
+          var name = this.homey.__('driver.yeelight_bedside_lamp')+ ' (' + result[i].address + ')';
           if (result[i].model == 'bslamp2') {
             var model = result[i].model;
           } else {
@@ -74,26 +76,26 @@ class YeelightDriver extends Homey.Driver {
           }
         } else if (result[i].model.startsWith('ceiling')) {
           if (result[i].model == 'ceiling' || result[i].model == 'ceiling1' || result[i].model == 'ceiling2' || result[i].model == 'ceiling3') {
-            var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
+            var name = this.homey.__('driver.yeelight_ceiling_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling';
           } else if (result[i].model == 'ceiling4') {
-            var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
+            var name = this.homey.__('driver.yeelight_ceiling_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling4';
           } else if (result[i].model == 'ceiling5' || result[i].model == 'ceiling6' || result[i].model == 'ceiling7' || result[i].model == 'ceiling8' || result[i].model == 'ceiling9') {
-            var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
+            var name = this.homey.__('driver.yeelight_ceiling_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling5+';
           } else if (result[i].model == 'ceiling10') {
-            var name = Homey.__('yeelight_meteorite_light')+ ' (' + result[i].address + ')';
+            var name = this.homey.__('driver.yeelight_meteorite_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling10';
           } else if (result[i].model == 'ceiling15') {
-            var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
+            var name = this.homey.__('driver.yeelight_ceiling_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling15';
           } else {
-            var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
+            var name = this.homey.__('driver.yeelight_ceiling_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling';
           }
         } else if (result[i].model == 'desklamp') {
-          var name = Homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
+          var name = this.homey.__('driver.yeelight_desklamp')+ ' (' + result[i].address + ')';
         } else {
           var name = 'Yeelight'+ ' (' + result[i].address + ')';
           var model = 'ceiling';
@@ -113,9 +115,10 @@ class YeelightDriver extends Homey.Driver {
         });
       }
 
-      callback(null, devices);
+      return devices;
     } catch (error) {
-      callback(error, false);
+      this.log(error);
+      throw new Error(error);
     }
   }
 

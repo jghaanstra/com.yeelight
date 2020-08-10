@@ -1,10 +1,14 @@
 {
-  "yeelight_bulb_color": "Yeelight Bulb Color",
-  "yeelight_bulb_white": "Yeelight Bulb White",
-  "yeelight_led_stripe": "Yeelight LED Strip",
-  "yeelight_bedside_lamp": "Yeelight Bedside Lamp",
-  "yeelight_ceiling_light": "Yeelight Ceiling Light",
-  "yeelight_meteorite_light": "Yeelight Meteorite Light",
-  "yeelight_desklamp": "Yeelight Desk Lamp",
-  "unreachable": "Offline"
+  "driver": {
+    "yeelight_bulb_color": "Yeelight Bulb Color",
+    "yeelight_bulb_white": "Yeelight Bulb White",
+    "yeelight_led_strip": "Yeelight LED Strip",
+    "yeelight_bedside_lamp": "Yeelight Bedside Lamp",
+    "yeelight_ceiling_light": "Yeelight Ceiling Light",
+    "yeelight_meteorite_light": "Yeelight Meteorite Light",
+    "yeelight_desklamp": "Yeelight Desk Lamp"
+  },
+  "device": {
+    "unreachable": "Yeelight is offline"
+  }
 }
