@@ -25,5 +25,11 @@
   },
   "1.1.2": {
     "en": "Add support for YLXD42YL (ceiling15)."
+  },
+  "1.1.3": {
+    "en": "Fix the icon for newer models of the desklamp. Requires repairing of these Yeelights."
+  },
+  "1.1.4": {
+    "en": "Fix the icon for newer models of the desklamp and removed light_mode capability as it does not support colors. Requires repairing of these Yeelights."
   }
 }

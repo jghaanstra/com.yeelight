@@ -15,7 +15,7 @@ const typeCapabilityMap = {
   'ceiling5+' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
   'ceiling10' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
   'ceiling15' : [ 'onoff', 'dim', 'light_temperature', 'light_mode', 'night_mode' ],
-  'desklamp'  : [ 'onoff', 'dim', 'light_temperature', 'light_mode' ]
+  'desklamp'  : [ 'onoff', 'dim', 'light_temperature' ]
 }
 
 const typeIconMap = {
@@ -92,8 +92,9 @@ class YeelightDriver extends Homey.Driver {
             var name = Homey.__('yeelight_ceiling_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling';
           }
-        } else if (result[i].model == 'desklamp') {
+        } else if (result[i].model.startsWith('desklamp')) {
           var name = Homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
+          var model = 'desklamp';
         } else {
           var name = 'Yeelight'+ ' (' + result[i].address + ')';
           var model = 'ceiling';
