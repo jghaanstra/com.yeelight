@@ -28,8 +28,5 @@
   },
   "3.0.0": {
     "en": "Update to SDK3 (require Homey firmware 5.x) and some minor improvements."
-  },
-  "3.0.1": {
-    "en": "Update to SDK3 (require Homey firmware 5.x) and some minor improvements."
   }
 }
