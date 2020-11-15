@@ -15,7 +15,8 @@ const typeCapabilityMap = {
   'ceiling5+' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
   'ceiling10' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
   'ceiling15' : [ 'onoff', 'dim', 'light_temperature', 'light_mode', 'night_mode' ],
-  'desklamp'  : [ 'onoff', 'dim', 'light_temperature', 'light_mode' ]
+  'desklamp'  : [ 'onoff', 'dim', 'light_temperature' ],
+  'lamp'      : [ 'onoff', 'dim', 'light_temperature' ]
 }
 
 const typeIconMap = {
@@ -30,7 +31,8 @@ const typeIconMap = {
   'ceiling5+'  : 'ceiling.svg',
   'ceiling10' : 'ceiling10.svg',
   'ceiling15' : 'ceiling4.svg',
-  'desklamp'  : 'desklamp.svg'
+  'desklamp'  : 'desklamp.svg',
+  'lamp'      : 'desklamp.svg'
 }
 
 class YeelightDriver extends Homey.Driver {
@@ -43,7 +45,7 @@ class YeelightDriver extends Homey.Driver {
 
     // update the list of added devices initially and on a frequent interval
     this.util.fillAddedDevices();
-    this.updateEventsInterval = setInterval(function() { this.util.fillAddedDevices() }, 300000);
+    this.updateEventsInterval = setInterval(async () => { await this.util.fillAddedDevices() }, 300000);
   }
 
   async onPairListDevices() {
@@ -51,6 +53,9 @@ class YeelightDriver extends Homey.Driver {
       let added_devices = await this.util.fillAddedDevices();
       let result = await this.util.discover();
       let devices = [];
+
+      // for device identification purposes
+      this.log(result);
 
       for (let i in result) {
         var name = '';
@@ -64,7 +69,7 @@ class YeelightDriver extends Homey.Driver {
           var model = 'mono';
         } else if (result[i].model == 'ct') {
           var name = this.homey.__('driver.yeelight_bulb_white')+ ' (' + result[i].address + ')';
-        } else if (result[i].model.startsWith('stripe')) {
+        } else if (result[i].model.startsWith('strip')) {
           var name = this.homey.__('driver.yeelight_led_strip')+ ' (' + result[i].address + ')';
           var model = 'stripe';
         } else if (result[i].model.startsWith('bslamp')) {
@@ -94,10 +99,14 @@ class YeelightDriver extends Homey.Driver {
             var name = this.homey.__('driver.yeelight_ceiling_light')+ ' (' + result[i].address + ')';
             var model = 'ceiling';
           }
-        } else if (result[i].model == 'desklamp') {
-          var name = this.homey.__('driver.yeelight_desklamp')+ ' (' + result[i].address + ')';
+        } else if (result[i].model.startsWith('desklamp')) {
+          var name = Homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
+          var model = 'desklamp';
+        } else if (result[i].model.startsWith('lamp')) {
+          var name = Homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
+          var model = 'lamp';
         } else {
-          var name = 'Yeelight'+ ' (' + result[i].address + ')';
+          var name = 'Unknown model'+ ' (' + result[i].model + ')';
           var model = 'ceiling';
         }
         devices.push({

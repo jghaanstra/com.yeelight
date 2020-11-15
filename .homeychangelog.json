@@ -25,5 +25,8 @@
   },
   "1.1.2": {
     "en": "Add support for YLXD42YL (ceiling15)."
+  },
+  "3.0.0": {
+    "en": "Update to SDK3 (require Homey firmware 5.x) and some minor improvements."
   }
 }

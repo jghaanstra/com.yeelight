@@ -20,31 +20,18 @@ class YeelightDevice extends Homey.Device {
     yeelights[id].connecting = false;
     yeelights[id].connected = false;
 
+    this.setAvailable();
     this.createDeviceSocket(id);
 
     // LISTENERS FOR UPDATING CAPABILITIES
     this.registerCapabilityListener('onoff', async (value) => {
-      try {
-        if (value) {
-          return await this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["on", "smooth", 500]}');
-        } else {
-          return await this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["off", "smooth", 500]}');
-        }
-      } catch (error) {
-        return Promise.reject(error);
-      }
+      const action = value ? 'on' : 'off';
+      return await this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["'+ action +'", "smooth", 500]}');
     });
 
     this.registerCapabilityListener('onoff.bg', async (value) => {
-      try {
-        if (value) {
-          return await this.sendCommand(this.getData().id, '{"id": 1, "method": "bg_set_power", "params":["on", "smooth", 500]}');
-        } else {
-          return await this.sendCommand(this.getData().id, '{"id": 1, "method": "bg_set_power", "params":["off", "smooth", 500]}');
-        }
-      } catch (error) {
-        return Promise.reject(error);
-      }
+      const action = value ? 'on' : 'off';
+      return await this.sendCommand(this.getData().id, '{"id": 1, "method": "bg_set_power", "params":["'+ action +'", "smooth", 500]}');
     });
 
     this.registerCapabilityListener('dim', async (value, opts) => {
@@ -86,11 +73,13 @@ class YeelightDevice extends Homey.Device {
           return await this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["off", "smooth", 500]}');
         } else if (value === 0) {
           if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling15' ) {
-            var color_temp = util.denormalize(this.getCapabilityValue('light_temperature'), 2700, 6000);
+            var color_temp = this.util.denormalize(this.getCapabilityValue('light_temperature'), 2700, 6000);
           } else if (this.getData().model == 'color') {
-            var color_temp = util.denormalize(this.getCapabilityValue('light_temperature'), 1700, 6500);
+            var color_temp = this.util.denormalize(this.getCapabilityValue('light_temperature'), 1700, 6500);
+          } else if (this.getData().model == 'lamp') {
+            var color_temp = this.util.denormalize(this.getCapabilityValue('light_temperature'), 2600, 5000);
           } else {
-            var color_temp = util.denormalize(this.getCapabilityValue('light_temperature'), 2700, 6500);
+            var color_temp = this.util.denormalize(this.getCapabilityValue('light_temperature'), 2700, 6500);
           }
           return await this.sendCommand(this.getData().id, '{"id":1,"method":"start_cf","params":[1, 2, "'+ opts.duration +', 2, '+ color_temp +', 0"]}');
         } else {
@@ -114,15 +103,8 @@ class YeelightDevice extends Homey.Device {
     });
 
     this.registerCapabilityListener('night_mode', async (value) => {
-      try {
-        if (value) {
-          return await this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["on", "smooth", 500, 5]}');
-        } else {
-          return await this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["on", "smooth", 500, 1]}');
-        }
-      } catch (error) {
-
-      }
+      const action = value ? '5' : '1';
+      return await this.sendCommand(this.getData().id, '{"id": 1, "method": "set_power", "params":["on", "smooth", 500, '+ action +']}');
     });
 
     this.registerMultipleCapabilityListener(['light_hue', 'light_saturation' ], async ( valueObj, optsObj ) => {
@@ -143,8 +125,8 @@ class YeelightDevice extends Homey.Device {
           var saturation_value = this.getCapabilityValue('light_saturation');
         }
 
-        var hue = hue_value * 359;
-        var saturation = saturation_value * 100;
+        let hue = hue_value * 359;
+        let saturation = saturation_value * 100;
 
         if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling10') {
           return await this.sendCommand(this.getData().id, '{"id":1,"method":"bg_set_hsv","params":['+ hue +','+ saturation +', "smooth", 500]}');
@@ -159,15 +141,17 @@ class YeelightDevice extends Homey.Device {
     this.registerCapabilityListener('light_temperature', async (value) => {
       try {
         if (!this.getCapabilityValue('onoff')) {
-          this.setCapabilityValue('onoff', true);
+          this.triggerCapabilityListener('onoff', true);
         }
 
         if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling15') {
-          var color_temp = util.denormalize(value, 2700, 6000);
+          var color_temp = this.util.denormalize(value, 2700, 6000);
         } else if (this.getData().model == 'color') {
-          var color_temp = util.denormalize(value, 1700, 6500);
+          var color_temp = this.util.denormalize(value, 1700, 6500);
+        } else if (this.getData().model == 'lamp') {
+          var color_temp = this.util.denormalize(value, 2600, 5000);
         } else {
-          var color_temp = util.denormalize(value, 2700, 6500);
+          var color_temp = this.util.denormalize(value, 2700, 6500);
         }
         if (this.hasCapability('night_mode')) {
           this.setCapabilityValue('night_mode', false);
@@ -183,8 +167,7 @@ class YeelightDevice extends Homey.Device {
         if (!this.getCapabilityValue('onoff.bg')) {
           this.setCapabilityValue('onoff.bg', true);
         }
-
-        var color_temp = util.denormalize(value, 2700, 6500);
+        const color_temp = this.util.denormalize(value, 2700, 6500);
         return await this.sendCommand(this.getData().id, '{"id":1,"method":"bg_set_ct_abx","params":['+ color_temp +', "smooth", 500]}');
       } catch (error) {
         return Promise.reject(error);
@@ -205,8 +188,6 @@ class YeelightDevice extends Homey.Device {
 
   /* establish socket with online devices and update state upon connect */
   createDeviceSocket(id) {
-
-    // TODO: let device = this?
     let device = this.homey.drivers.getDriver('yeelight').getDevice(yeelights[id].data);
 
     try {
@@ -258,8 +239,10 @@ class YeelightDevice extends Homey.Device {
 
       if (yeelights[id].reconnect === null) {
         yeelights[id].reconnect = setTimeout(() => {
-          if (yeelights[id].connecting === false && yeelights[id].connected === false) {
-            this.createDeviceSocket(id);
+          if (typeof yeelights[id].connecting !== "undefined" && typeof yeelights[id].connected !== "undefined") {
+            if (yeelights[id].connecting === false && yeelights[id].connected === false) {
+              this.createDeviceSocket(id);
+            }
           }
           yeelights[id].reconnect = null;
         }, time2retry);
@@ -284,8 +267,7 @@ class YeelightDevice extends Homey.Device {
         device.setAvailable();
       }
 
-      var result = message.toString();
-      var result = result.replace(/{"id":1, "result":\["ok"\]}/g, "").replace(/\r\n/g,'');
+      var result = message.toString().replace(/{"id":1, "result":\["ok"\]}/g, "").replace(/\r\n/g,'');
 
       if (result.includes('props')) {
         try {
@@ -321,11 +303,13 @@ class YeelightDevice extends Homey.Device {
               break;
             case 'ct':
               if (device.getData().model == 'ceiling4') {
-                var color_temp = util.normalize(result.params.ct, 2700, 6000);
+                var color_temp = this.util.normalize(result.params.ct, 2700, 6000);
               } else if (device.getData().model == 'color') {
-                var color_temp = util.normalize(result.params.ct, 1700, 6500);
+                var color_temp = this.util.normalize(result.params.ct, 1700, 6500);
+              } else if (device.getData().model == 'lamp') {
+                var color_temp = this.util.normalize(result.params.ct, 2600, 5000);
               } else {
-                var color_temp = util.normalize(result.params.ct, 2700, 6500);
+                var color_temp = this.util.normalize(result.params.ct, 2700, 6500);
               }
               if (device.hasCapability('light_temperature')) {
                 if (device.getCapabilityValue('light_temperature') != color_temp) {
@@ -334,7 +318,7 @@ class YeelightDevice extends Homey.Device {
               }
               break;
             case 'bg_ct':
-              var color_temp = util.normalize(result.params.bg_ct, 2700, 6500);
+              var color_temp = this.util.normalize(result.params.bg_ct, 2700, 6500);
               if (device.hasCapability('light_temperature.bg')) {
                 if (device.getCapabilityValue('light_temperature.bg') != color_temp) {
                   device.setCapabilityValue('light_temperature.bg', color_temp);
@@ -420,11 +404,13 @@ class YeelightDevice extends Homey.Device {
             var hue = result.result[5] / 359;
             var saturation = result.result[6] / 100;
             if (device.getData().model == 'ceiling4') {
-              var color_temp = util.normalize(result.result[3], 2700, 6000);
+              var color_temp = this.util.normalize(result.result[3], 2700, 6000);
             } else if (device.getData().model == 'color') {
-              var color_temp = util.normalize(result.result[3], 1700, 6500);
+              var color_temp = this.util.normalize(result.result[3], 1700, 6500);
+            } else if (device.getData().model == 'lamp') {
+              var color_temp = this.util.normalize(result.result[3], 2600, 5000);
             } else {
-              var color_temp = util.normalize(result.result[3], 2700, 6500);
+              var color_temp = this.util.normalize(result.result[3], 2700, 6500);
             }
             if(result.result[2] == 2) {
               var color_mode = 'temperature';
