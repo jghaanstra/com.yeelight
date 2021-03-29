@@ -34,5 +34,8 @@
   },
   "3.0.2": {
     "en": "Update to SDK3 (requires Homey firmware 5.x) and minor improvements."
+  },
+  "3.0.3": {
+    "en": "Fix issue with pairing of (desk)lamps."
   }
 }

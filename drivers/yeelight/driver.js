@@ -100,10 +100,10 @@ class YeelightDriver extends Homey.Driver {
             var model = 'ceiling';
           }
         } else if (result[i].model.startsWith('desklamp')) {
-          var name = Homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
+          var name = this.homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
           var model = 'desklamp';
         } else if (result[i].model.startsWith('lamp')) {
-          var name = Homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
+          var name = this.homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
           var model = 'lamp';
         } else {
           var name = 'Unknown model'+ ' (' + result[i].model + ')';
