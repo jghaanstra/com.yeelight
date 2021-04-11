@@ -10,7 +10,7 @@
 		"en": [ "yeelight", "yeelights" ],
 		"nl": [ "yeelight", "yeelights" ]
 	},
-	"version": "3.0.3",
+	"version": "3.0.4",
 	"compatibility": ">=5.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
@@ -179,6 +179,10 @@
 					"en": "Change brightness over time",
 					"nl": "Wijzig helderheid over tijd"
 				},
+        "titleFormatted": {
+          "en": "Change brightness to [[brightness]], temperature to [[temperature]] in [[duration]] milliseconds and recover to [[action]]",
+          "nl": "Wijzig helderheid naar [[brightness]], temperatuur naar [[temperature]] in [[duration]] milliseconden en herstel naar [[action]]"
+        },
         "hint": {
 					"en": "Use this card to create a changing effect of temperature and brightness over time (duration in milliseconds, temperature in Kelvin 1700-6500 and brightness in percentage)",
 					"nl": "Gebruik deze actie voor een veranderd effect van licht temperatuur en helderheid over tijd (doorlooptijd in milliseconden, temperatuur in Kelvin 1700-6500 en helderheid in percentage)"
@@ -264,6 +268,10 @@
 					"en": "Temperature and brightness",
 					"nl": "Temperatuur en helderheid"
 				},
+        "titleFormatted": {
+          "en": "Change temperature to [[temperature]] and brightness to [[brightness]]",
+          "nl": "Wijzig temperatuur naar [[temperature]] en helderheid naar [[brightness]]"
+        },
         "hint": {
 					"en": "Use this card to set the temperature and brightness directly (temperature in Kelvin 1700-6500 and brightness in percentage)",
 					"nl": "Gebruik deze actie om de temperatuur en helderheid direct in te stellen (temperatuur in Kelvin 1700-6500 en helderheid in percentage)"
@@ -308,6 +316,10 @@
 					"en": "Color and brightness",
 					"nl": "Kleur en helderheid"
 				},
+        "titleFormatted": {
+          "en": "Change color to [[color]] and brightness to [[brightness]]",
+          "nl": "Wijzig kleur naar [[color]] en helderheid naar [[brightness]]"
+        },
         "hint": {
 					"en": "Use this card to set the color and brightness directly (brightness in percentage)",
 					"nl": "Gebruik deze actie om de kleur en helderheid direct in te stellen (helderheid in percentage)"
@@ -345,6 +357,10 @@
 					"en": "Send command (advanced)",
 					"nl": "Verstuur commando (geadvanceerd)"
 				},
+        "titleFormatted": {
+          "en": "Send advanced command [[command]] ",
+          "nl": "Verstuur geadvanceerd commando [[command]]"
+        },
         "hint": {
 					"en": "Advanced users can use this card to send any custom command, see the Yeelight documentation for options",
 					"nl": "Geadvanceerde gebruikers kunnen deze actie gebruiken om maatwerk commands te versturen, zie de Yeelight documentatie voor opties"
@@ -375,6 +391,10 @@
 					"en": "Toggle Night Mode",
 					"nl": "Schakel nacht modus"
 				},
+        "titleFormatted": {
+          "en": "Toggle night mode to [[mode]]",
+          "nl": "Schakel nacht modus naar [[mode]]"
+        },
 				"hint": {
 					"en": "Use this card to switch the light between night mode and normal mode",
 					"nl": "Gebruik deze actie om de lamp tussen nacht modus en gewone modus te schakelen"
@@ -417,6 +437,10 @@
 					"en": "Switch ambilight",
 					"nl": "Schakel ambilight"
 				},
+        "titleFormatted": {
+          "en": "Switch ambilight to [[switch]]",
+          "nl": "Schakel ambilight naar [[switch]]"
+        },
 				"hint": {
 					"en": "Use this card to switch the ambilight on or off.",
 					"nl": "Gebruik deze actie om de ambilight van de de lamp te schakelen."
@@ -459,6 +483,10 @@
 					"en": "Dim ambilight",
 					"nl": "Dim ambilight"
 				},
+        "titleFormatted": {
+          "en": "Dim ambilight to [[brightness]] in [[duration_bg]] seconds",
+          "nl": "Dim ambilight naar [[brightness]] in [[duration_bg]] seconden"
+        },
 				"hint": {
 					"en": "Use this card to dim the ambilight and the duration for dimming in seconds.",
 					"nl": "Gebruik deze actie om de ambilight van de de lamp te dimmen met de ingestelde duur in seconden."
@@ -502,6 +530,10 @@
 					"en": "Temperature ambilight",
 					"nl": "Temperature ambilight"
 				},
+        "titleFormatted": {
+          "en": "Set ambilight temperature to [[temperature]]",
+          "nl": "Zet ambilight temperatuur naar [[temperature]]"
+        },
 				"hint": {
 					"en": "Use this card to set the temperature of the ambilight. A higher value is a warmer temperature.",
 					"nl": "Gebruik deze actie om de temperatuur van de ambilight in te stellen. Een hogere waarde is een warmere temperatuur."

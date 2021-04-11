@@ -37,5 +37,8 @@
   },
   "3.0.3": {
     "en": "Fix issue with pairing of (desk)lamps."
+  },
+  "3.0.4": {
+    "en": "Add full support for ceiling20 (YLXD50YL)."
   }
 }
