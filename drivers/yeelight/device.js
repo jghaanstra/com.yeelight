@@ -128,7 +128,7 @@ class YeelightDevice extends Homey.Device {
         let hue = hue_value * 359;
         let saturation = saturation_value * 100;
 
-        if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling10') {
+        if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling10' || this.getData().model == 'ceiling20') {
           return await this.sendCommand(this.getData().id, '{"id":1,"method":"bg_set_hsv","params":['+ hue +','+ saturation +', "smooth", 500]}');
         } else {
           return await this.sendCommand(this.getData().id, '{"id":1,"method":"set_hsv","params":['+ hue +','+ saturation +', "smooth", 500]}');
