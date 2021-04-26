@@ -43,5 +43,8 @@
   },
   "3.0.5": {
     "en": "Fix for setting ambilight color on model ceiling 20 (YLXD50YL)."
+  },
+  "3.0.6": {
+    "en": "Fix some capabilities not updating when controlled from outside of Homey."
   }
 }

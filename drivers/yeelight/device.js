@@ -174,6 +174,10 @@ class YeelightDevice extends Homey.Device {
       }
     });
 
+    this.registerCapabilityListener('light_mode', async (value) => {
+
+    });
+
   }
 
   onDeleted() {
@@ -276,6 +280,7 @@ class YeelightDevice extends Homey.Device {
 
           switch (key) {
             case 'power':
+            case 'main_power':
               if(result.params.power == 'on' && device.getCapabilityValue('onoff') == false) {
                 device.setCapabilityValue('onoff', true);
               } else if (result.params.power == 'off' && device.getCapabilityValue('onoff') == true) {
@@ -290,6 +295,7 @@ class YeelightDevice extends Homey.Device {
               }
               break;
             case 'bright':
+            case 'active_bright':
               var dim = result.params.bright / 100;
               if (device.getCapabilityValue('dim') != dim) {
                 device.setCapabilityValue('dim', dim);
@@ -326,6 +332,7 @@ class YeelightDevice extends Homey.Device {
               }
               break;
             case 'rgb':
+            case 'bg_rgb':
               var color = tinycolor(result.params.rgb.toString(16));
               var hsv = color.toHsv();
               var hue = Math.round(hsv.h) / 359;
@@ -340,6 +347,7 @@ class YeelightDevice extends Homey.Device {
               }
               break;
             case 'hue':
+            case 'bg_hue':
               var hue = result.params.hue / 359;
               if (device.hasCapability('light_hue')) {
                 if (device.getCapabilityValue('light_hue') != hue) {
@@ -348,6 +356,7 @@ class YeelightDevice extends Homey.Device {
               }
               break;
             case 'sat':
+            case 'bg_sat':
               var saturation = result.params.sat / 100;
               if (device.hasCapability('light_saturation')) {
                 if (device.getCapabilityValue('light_saturation') != saturation) {
