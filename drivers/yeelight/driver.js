@@ -7,6 +7,7 @@ const typeCapabilityMap = {
 	'mono'      : [ 'onoff', 'dim' ],
   'ct'        : [ 'onoff', 'dim', 'light_temperature' ],
 	'color'     : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
+  'colorc'    : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'stripe'    : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'bslamp'    : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'bslamp2'   : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
@@ -23,6 +24,7 @@ const typeCapabilityMap = {
 const typeIconMap = {
 	'mono'      : 'bulb.svg',
 	'color'     : 'bulb.svg',
+  'colorc'    : 'gu10.svg',
   'stripe'    : 'strip.svg',
   'stripe1'   : 'strip.svg',
   'bslamp'    : 'bslamp.svg',
@@ -41,13 +43,6 @@ class YeelightDriver extends Homey.Driver {
 
   onInit() {
     if (!this.util) this.util = new Util({homey: this.homey});
-
-    // listen to updates when devices come online and on regular interval to pick up IP address changes. Also allow discover message to be send and discover results to be received
-    this.util.listenUpdates();
-
-    // update the list of added devices initially and on a frequent interval
-    this.util.fillAddedDevices();
-    this.updateEventsInterval = setInterval(async () => { await this.util.fillAddedDevices() }, 300000);
   }
 
   async onPairListDevices() {
@@ -64,8 +59,13 @@ class YeelightDriver extends Homey.Driver {
         var model = '';
 
         if(result[i].model.startsWith('color')) {
-          var name = this.homey.__('driver.yeelight_bulb_color')+ ' (' + result[i].address + ')';
-          var model = 'color';
+          if(result[i].model === 'colorc') {
+            var name = this.homey.__('driver.yeelight_gu10')+ ' (' + result[i].address + ')';
+            var model = 'colorc';
+          } else {
+            var name = this.homey.__('driver.yeelight_bulb_color')+ ' (' + result[i].address + ')';
+            var model = 'color';
+          }
         } else if (result[i].model.startsWith('mono')) {
           var name = this.homey.__('driver.yeelight_bulb_white')+ ' (' + result[i].address + ')';
           var model = 'mono';

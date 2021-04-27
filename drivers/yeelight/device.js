@@ -74,7 +74,7 @@ class YeelightDevice extends Homey.Device {
         } else if (value === 0) {
           if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling15' ) {
             var color_temp = this.util.denormalize(this.getCapabilityValue('light_temperature'), 2700, 6000);
-          } else if (this.getData().model == 'color') {
+          } else if (this.getData().model == 'color' || device.getData().model == 'colorc') {
             var color_temp = this.util.denormalize(this.getCapabilityValue('light_temperature'), 1700, 6500);
           } else if (this.getData().model == 'lamp') {
             var color_temp = this.util.denormalize(this.getCapabilityValue('light_temperature'), 2600, 5000);
@@ -146,7 +146,7 @@ class YeelightDevice extends Homey.Device {
 
         if (this.getData().model == 'ceiling4' || this.getData().model == 'ceiling15') {
           var color_temp = this.util.denormalize(value, 2700, 6000);
-        } else if (this.getData().model == 'color') {
+        } else if (this.getData().model == 'color' || device.getData().model == 'colorc') {
           var color_temp = this.util.denormalize(value, 1700, 6500);
         } else if (this.getData().model == 'lamp') {
           var color_temp = this.util.denormalize(value, 2600, 5000);
@@ -276,129 +276,168 @@ class YeelightDevice extends Homey.Device {
       if (result.includes('props')) {
         try {
           var result = JSON.parse(result);
-          var key = Object.keys(result.params)[0];
 
-          switch (key) {
-            case 'power':
-            case 'main_power':
-              if(result.params.power == 'on' && device.getCapabilityValue('onoff') == false) {
-                device.setCapabilityValue('onoff', true);
-              } else if (result.params.power == 'off' && device.getCapabilityValue('onoff') == true) {
-                device.setCapabilityValue('onoff', false);
-              }
-              break;
-            case 'bg_power':
-              if(result.params.bg_power == 'on' && device.getCapabilityValue('onoff.bg') == false) {
-                device.setCapabilityValue('onoff.bg', true);
-              } else if (result.params.bg_power == 'off' && device.getCapabilityValue('onoff.bg') == true) {
-                device.setCapabilityValue('onoff.bg', false);
-              }
-              break;
-            case 'bright':
-            case 'active_bright':
-              var dim = result.params.bright / 100;
-              if (device.getCapabilityValue('dim') != dim) {
-                device.setCapabilityValue('dim', dim);
-              }
-              break;
-            case 'bg_bright':
-              var dim_bg = result.params.bg_bright / 100;
-              if (device.getCapabilityValue('dim.bg') != dim_bg) {
-                device.setCapabilityValue('dim.bg', dim_bg);
-              }
-              break;
-            case 'ct':
-              if (device.getData().model == 'ceiling4') {
-                var color_temp = this.util.normalize(result.params.ct, 2700, 6000);
-              } else if (device.getData().model == 'color') {
-                var color_temp = this.util.normalize(result.params.ct, 1700, 6500);
-              } else if (device.getData().model == 'lamp') {
-                var color_temp = this.util.normalize(result.params.ct, 2600, 5000);
-              } else {
-                var color_temp = this.util.normalize(result.params.ct, 2700, 6500);
-              }
-              if (device.hasCapability('light_temperature')) {
-                if (device.getCapabilityValue('light_temperature') != color_temp) {
-                  device.setCapabilityValue('light_temperature', color_temp);
+          for (const key in result.params) {
+            switch (key) {
+              case 'power':
+                if(result.params.power == 'on' && device.getCapabilityValue('onoff') == false) {
+                  device.setCapabilityValue('onoff', true);
+                } else if (result.params.power == 'off' && device.getCapabilityValue('onoff') == true) {
+                  device.setCapabilityValue('onoff', false);
                 }
-              }
-              break;
-            case 'bg_ct':
-              var color_temp = this.util.normalize(result.params.bg_ct, 2700, 6500);
-              if (device.hasCapability('light_temperature.bg')) {
-                if (device.getCapabilityValue('light_temperature.bg') != color_temp) {
-                  device.setCapabilityValue('light_temperature.bg', color_temp);
+                break;
+              case 'main_power':
+                if(result.params.main_power == 'on' && device.getCapabilityValue('onoff') == false) {
+                  device.setCapabilityValue('onoff', true);
+                } else if (result.params.main_power == 'off' && device.getCapabilityValue('onoff') == true) {
+                  device.setCapabilityValue('onoff', false);
                 }
-              }
-              break;
-            case 'rgb':
-            case 'bg_rgb':
-              var color = tinycolor(result.params.rgb.toString(16));
-              var hsv = color.toHsv();
-              var hue = Math.round(hsv.h) / 359;
-              var saturation = Math.round(hsv.s);
-              if (device.hasCapability('light_hue') && device.hasCapability('light_saturation')) {
-                if (device.getCapabilityValue('light_hue') != hue) {
-                  device.setCapabilityValue('light_hue', hue);
+                break;
+              case 'bg_power':
+                if(result.params.bg_power == 'on' && device.getCapabilityValue('onoff.bg') == false) {
+                  device.setCapabilityValue('onoff.bg', true);
+                } else if (result.params.bg_power == 'off' && device.getCapabilityValue('onoff.bg') == true) {
+                  device.setCapabilityValue('onoff.bg', false);
                 }
-                if (device.getCapabilityValue('light_saturation') != saturation) {
-                  device.setCapabilityValue('light_saturation', saturation);
-                }
-              }
-              break;
-            case 'hue':
-            case 'bg_hue':
-              var hue = result.params.hue / 359;
-              if (device.hasCapability('light_hue')) {
-                if (device.getCapabilityValue('light_hue') != hue) {
-                  device.setCapabilityValue('light_hue', hue);
-                }
-              }
-              break;
-            case 'sat':
-            case 'bg_sat':
-              var saturation = result.params.sat / 100;
-              if (device.hasCapability('light_saturation')) {
-                if (device.getCapabilityValue('light_saturation') != saturation) {
-                  device.setCapabilityValue('light_saturation', saturation);
-                }
-              }
-              break;
-            case 'color_mode':
-              if (device.hasCapability('light_mode')) {
-                if (result.params.color_mode == 2) {
-                  device.setCapabilityValue('light_mode', 'temperature');
-                } else {
-                  device.setCapabilityValue('light_mode', 'color');
-                }
-              }
-              break;
-            case 'bg_lmode':
-              if (device.hasCapability('light_mode.bg')) {
-                if (result.params.bg_lmode == 2) {
-                  device.setCapabilityValue('light_mode.bg', 'temperature');
-                } else {
-                  device.setCapabilityValue('light_mode.bg', 'color');
-                }
-              }
-              break;
-            case 'nl_br':
-              if (result.params.nl_br !== 0) {
-                var dim = result.params.nl_br / 100;
+                break;
+              case 'bright':
+                var dim = result.params.bright / 100;
                 if (device.getCapabilityValue('dim') != dim) {
                   device.setCapabilityValue('dim', dim);
                 }
-              }
-              if (device.hasCapability('night_mode')) {
-                if (result.params.active_mode == 0 && device.getCapabilityValue('night_mode') == true) {
-                  device.setCapabilityValue('night_mode', false);
-                } else if (result.params.active_mode != 0 && device.getCapabilityValue('night_mode') == false) {
-                  device.setCapabilityValue('night_mode', true);
+                break;
+              case 'active_bright':
+                var active_dim = result.params.active_bright / 100;
+                if (device.getCapabilityValue('dim') != active_dim) {
+                  device.setCapabilityValue('dim', active_dim);
                 }
-              }
-              break;
-            default:
-              break;
+                break;
+              case 'bg_bright':
+                var dim_bg = result.params.bg_bright / 100;
+                if (device.getCapabilityValue('dim.bg') != dim_bg) {
+                  device.setCapabilityValue('dim.bg', dim_bg);
+                }
+                break;
+              case 'ct':
+                if (device.getData().model == 'ceiling4') {
+                  var color_temp = this.util.normalize(result.params.ct, 2700, 6000);
+                } else if (device.getData().model == 'color' || device.getData().model == 'colorc') {
+                  var color_temp = this.util.normalize(result.params.ct, 1700, 6500);
+                } else if (device.getData().model == 'lamp') {
+                  var color_temp = this.util.normalize(result.params.ct, 2600, 5000);
+                } else {
+                  var color_temp = this.util.normalize(result.params.ct, 2700, 6500);
+                }
+                if (device.hasCapability('light_temperature')) {
+                  if (device.getCapabilityValue('light_temperature') != color_temp) {
+                    device.setCapabilityValue('light_temperature', color_temp);
+                  }
+                }
+                break;
+              case 'bg_ct':
+                var color_temp = this.util.normalize(result.params.bg_ct, 2700, 6500);
+                if (device.hasCapability('light_temperature.bg')) {
+                  if (device.getCapabilityValue('light_temperature.bg') != color_temp) {
+                    device.setCapabilityValue('light_temperature.bg', color_temp);
+                  }
+                }
+                break;
+              case 'rgb':
+                var color = tinycolor(result.params.rgb.toString(16));
+                var hsv = color.toHsv();
+                var hue = Math.round(hsv.h) / 359;
+                var saturation = Math.round(hsv.s);
+                if (device.hasCapability('light_hue') && device.hasCapability('light_saturation')) {
+                  if (device.getCapabilityValue('light_hue') != hue) {
+                    device.setCapabilityValue('light_hue', hue);
+                  }
+                  if (device.getCapabilityValue('light_saturation') != saturation) {
+                    device.setCapabilityValue('light_saturation', saturation);
+                  }
+                }
+                break;
+              case 'bg_rgb':
+                var rgb_color = tinycolor(result.params.bg_rgb.toString(16));
+                var rgb_hsv = rgb_color.toHsv();
+                var rgb_hue = Math.round(rgb_hsv.h) / 359;
+                var rgb_saturation = Math.round(rgb_hsv.s);
+                if (device.hasCapability('light_hue') && device.hasCapability('light_saturation')) {
+                  if (device.getCapabilityValue('light_hue') != rgb_hue) {
+                    device.setCapabilityValue('light_hue', rgb_hue);
+                  }
+                  if (device.getCapabilityValue('light_saturation') != rgb_saturation) {
+                    device.setCapabilityValue('light_saturation', rgb_saturation);
+                  }
+                }
+                break;
+              case 'hue':
+                var hue = result.params.hue / 359;
+                if (device.hasCapability('light_hue')) {
+                  if (device.getCapabilityValue('light_hue') != hue) {
+                    device.setCapabilityValue('light_hue', hue);
+                  }
+                }
+                break;
+              case 'bg_hue':
+                var bg_hue = result.params.hue / 359;
+                if (device.hasCapability('light_hue')) {
+                  if (device.getCapabilityValue('light_hue') != bg_hue) {
+                    device.setCapabilityValue('light_hue', bg_hue);
+                  }
+                }
+                break;
+              case 'sat':
+                var saturation = result.params.sat / 100;
+                if (device.hasCapability('light_saturation')) {
+                  if (device.getCapabilityValue('light_saturation') != saturation) {
+                    device.setCapabilityValue('light_saturation', saturation);
+                  }
+                }
+                break;
+              case 'bg_sat':
+                var bg_saturation = result.params.sat / 100;
+                if (device.hasCapability('light_saturation')) {
+                  if (device.getCapabilityValue('light_saturation') != bg_saturation) {
+                    device.setCapabilityValue('light_saturation', bg_saturation);
+                  }
+                }
+                break;
+              case 'color_mode':
+                if (device.hasCapability('light_mode')) {
+                  if (result.params.color_mode == 2) {
+                    device.setCapabilityValue('light_mode', 'temperature');
+                  } else {
+                    device.setCapabilityValue('light_mode', 'color');
+                  }
+                }
+                break;
+              case 'bg_lmode':
+                if (device.hasCapability('light_mode.bg')) {
+                  if (result.params.bg_lmode == 2) {
+                    device.setCapabilityValue('light_mode.bg', 'temperature');
+                  } else {
+                    device.setCapabilityValue('light_mode.bg', 'color');
+                  }
+                }
+                break;
+              case 'nl_br':
+                if (result.params.nl_br !== 0) {
+                  var dim = result.params.nl_br / 100;
+                  if (device.getCapabilityValue('dim') != dim) {
+                    device.setCapabilityValue('dim', dim);
+                  }
+                }
+                if (device.hasCapability('night_mode')) {
+                  if (result.params.active_mode == 0 && device.getCapabilityValue('night_mode') == true) {
+                    device.setCapabilityValue('night_mode', false);
+                  } else if (result.params.active_mode != 0 && device.getCapabilityValue('night_mode') == false) {
+                    device.setCapabilityValue('night_mode', true);
+                  }
+                }
+                break;
+              default:
+                break;
+            }
           }
 
         } catch (error) {
@@ -414,7 +453,7 @@ class YeelightDevice extends Homey.Device {
             var saturation = result.result[6] / 100;
             if (device.getData().model == 'ceiling4') {
               var color_temp = this.util.normalize(result.result[3], 2700, 6000);
-            } else if (device.getData().model == 'color') {
+            } else if (device.getData().model == 'color' || device.getData().model == 'colorc') {
               var color_temp = this.util.normalize(result.result[3], 1700, 6500);
             } else if (device.getData().model == 'lamp') {
               var color_temp = this.util.normalize(result.result[3], 2600, 5000);

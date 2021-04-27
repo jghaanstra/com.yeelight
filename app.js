@@ -1,6 +1,7 @@
 'use strict';
 
 const Homey = require('homey');
+const Util = require('/lib/util.js');
 const tinycolor = require('tinycolor2');
 
 class YeelightApp extends Homey.App {
@@ -8,6 +9,17 @@ class YeelightApp extends Homey.App {
   onInit() {
     this.log('Initializing Yeelight app ...');
 
+    if (!this.util) this.util = new Util({homey: this.homey});
+
+    // listen to updates when devices come online and on regular interval to pick up IP address changes. Also allow discover message to be send and discover results to be received
+    this.util.listenUpdates();
+
+    // update the list of added devices initially and on a frequent interval
+    setTimeout(async () => { await this.util.fillAddedDevices(); }, 20000);
+    this.updateEventsInterval = setInterval(async () => { await this.util.fillAddedDevices() }, 300000);
+
+
+    /* FLOW CARDS */
     this.homey.flow.getConditionCard('yeelightNightmode')
       .registerRunListener(async (args) => {
         return await args.device.getCapabilityValue('night_mode');

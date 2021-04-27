@@ -1,6 +1,7 @@
 {
   "driver": {
     "yeelight_bulb_color": "Yeelight Bulb Color",
+    "yeelight_gu10": "Yeelight GU 10",
     "yeelight_bulb_white": "Yeelight Bulb White",
     "yeelight_led_strip": "Yeelight LED Strip",
     "yeelight_bedside_lamp": "Yeelight Bedside Lamp",
