@@ -47,7 +47,6 @@ class YeelightDriver extends Homey.Driver {
 
   async onPairListDevices() {
     try {
-      let added_devices = await this.util.fillAddedDevices();
       let result = await this.util.discover();
       let devices = [];
 

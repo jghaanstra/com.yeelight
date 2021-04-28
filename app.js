@@ -14,8 +14,7 @@ class YeelightApp extends Homey.App {
     // listen to updates when devices come online and on regular interval to pick up IP address changes. Also allow discover message to be send and discover results to be received
     this.util.listenUpdates();
 
-    // update the list of added devices initially and on a frequent interval
-    setTimeout(async () => { await this.util.fillAddedDevices(); }, 20000);
+    // update the list of added devices on a frequent interval
     this.updateEventsInterval = setInterval(async () => { await this.util.fillAddedDevices() }, 300000);
 
 

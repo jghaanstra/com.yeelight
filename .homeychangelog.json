@@ -49,5 +49,8 @@
   },
   "3.0.7": {
     "en": "Fix some capabilities not updating when controlled from outside of Homey."
+  },
+  "3.0.8": {
+    "en": "Fix some minor issues and some code improvements."
   }
 }
