@@ -307,12 +307,12 @@ class YeelightDevice extends Homey.Device {
                 break;
               case 'ct':
                 console.log(result.params.ct);
-                if (this.getData().model == 'color' || this.getData().model == 'colorc') {
-                  var color_temp = this.util.normalize(result.params.ct, 1700, 6500);
-                } else if (this.getData().model == 'lamp') {
-                  var color_temp = this.util.normalize(result.params.ct, 2600, 5000);
+                if (this.getData().model === 'color' || this.getData().model === 'colorc') {
+                  var color_temp = 1 - this.util.normalize(result.params.ct, 1700, 6500);
+                } else if (this.getData().model === 'lamp') {
+                  var color_temp = 1 - this.util.normalize(result.params.ct, 2600, 5000);
                 } else {
-                  var color_temp = this.util.normalize(result.params.ct, 2700, 6500);
+                  var color_temp = 1 - this.util.normalize(result.params.ct, 2700, 6500);
                 }
                 if (this.hasCapability('light_temperature')) {
                   if (this.getCapabilityValue('light_temperature') !== color_temp) {
@@ -321,7 +321,7 @@ class YeelightDevice extends Homey.Device {
                 }
                 break;
               case 'bg_ct':
-                var color_temp = this.util.normalize(result.params.bg_ct, 2700, 6500);
+                var color_temp = 1 - this.util.normalize(result.params.bg_ct, 2700, 6500);
                 if (this.hasCapability('light_temperature.bg')) {
                   if (this.getCapabilityValue('light_temperature.bg') !== color_temp) {
                     this.setCapabilityValue('light_temperature.bg', color_temp);
