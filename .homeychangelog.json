@@ -55,5 +55,8 @@
   },
   "3.0.9": {
     "en": "Fixed an issue where the color temperature wheel jumped to a different value after being set."
+  },
+  "3.0.10": {
+    "en": "Fixed an issue with setting hue and saturation."
   }
 }

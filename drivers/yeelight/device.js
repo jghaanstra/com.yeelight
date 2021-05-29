@@ -112,19 +112,16 @@ class YeelightDevice extends Homey.Device {
         }
 
         if (typeof valueObj.light_hue !== 'undefined') {
-          var hue_value = valueObj.light_hue;
+          var hue = Math.round(valueObj.light_hue * 359);
         } else {
-          var hue_value = this.getCapabilityValue('light_hue');
+          var hue = await this.getCapabilityValue('light_hue') * 359;
         }
 
         if (typeof valueObj.light_saturation !== 'undefined') {
-          var saturation_value = valueObj.light_saturation;
+          var saturation = Math.round(valueObj.light_saturation * 100);
         } else {
-          var saturation_value = this.getCapabilityValue('light_saturation');
+          var saturation = await this.getCapabilityValue('light_saturation') * 100;
         }
-
-        let hue = hue_value * 359;
-        let saturation = saturation_value * 100;
 
         if (this.getData().model === 'ceiling4' || this.getData().model === 'ceiling10' || this.getData().model === 'ceiling20') {
           return await this.sendCommand(this.getData().id, '{"id":1,"method":"bg_set_hsv","params":['+ hue +','+ saturation +', "smooth", 500]}');
@@ -306,7 +303,6 @@ class YeelightDevice extends Homey.Device {
                 }
                 break;
               case 'ct':
-                console.log(result.params.ct);
                 if (this.getData().model === 'color' || this.getData().model === 'colorc') {
                   var color_temp = 1 - this.util.normalize(result.params.ct, 1700, 6500);
                 } else if (this.getData().model === 'lamp') {
@@ -331,8 +327,8 @@ class YeelightDevice extends Homey.Device {
               case 'rgb':
                 var color = tinycolor(result.params.rgb.toString(16));
                 var hsv = color.toHsv();
-                var hue = Math.round(hsv.h) / 359;
-                var saturation = Math.round(hsv.s);
+                var hue = Number((hsv.h / 359).toFixed(2));
+                var saturation = Number(hsv.s.toFixed(2));
                 if (this.hasCapability('light_hue') && this.hasCapability('light_saturation')) {
                   if (this.getCapabilityValue('light_hue') !== hue) {
                     this.setCapabilityValue('light_hue', hue);
@@ -345,8 +341,8 @@ class YeelightDevice extends Homey.Device {
               case 'bg_rgb':
                 var rgb_color = tinycolor(result.params.bg_rgb.toString(16));
                 var rgb_hsv = rgb_color.toHsv();
-                var rgb_hue = Math.round(rgb_hsv.h) / 359;
-                var rgb_saturation = Math.round(rgb_hsv.s);
+                var rgb_hue = Number((rgb_hsv.h / 359).toFixed(2));
+                var rgb_saturation = Number(rgb_hsv.s.toFixed(2));
                 if (this.hasCapability('light_hue') && this.hasCapability('light_saturation')) {
                   if (this.getCapabilityValue('light_hue') !== rgb_hue) {
                     this.setCapabilityValue('light_hue', rgb_hue);
@@ -365,7 +361,7 @@ class YeelightDevice extends Homey.Device {
                 }
                 break;
               case 'bg_hue':
-                var bg_hue = result.params.hue / 359;
+                var bg_hue = result.params.bg_hue / 359;
                 if (this.hasCapability('light_hue')) {
                   if (this.getCapabilityValue('light_hue') !== bg_hue) {
                     this.setCapabilityValue('light_hue', bg_hue);
@@ -381,7 +377,7 @@ class YeelightDevice extends Homey.Device {
                 }
                 break;
               case 'bg_sat':
-                var bg_saturation = result.params.sat / 100;
+                var bg_saturation = result.params.bg_sat / 100;
                 if (this.hasCapability('light_saturation')) {
                   if (this.getCapabilityValue('light_saturation') !== bg_saturation) {
                     this.setCapabilityValue('light_saturation', bg_saturation);
