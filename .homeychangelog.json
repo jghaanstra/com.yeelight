@@ -58,5 +58,8 @@
   },
   "3.0.10": {
     "en": "Fixed an issue with setting hue and saturation."
+  },
+  "3.0.11": {
+    "en": "Branding improvements, no functional changes."
   }
 }

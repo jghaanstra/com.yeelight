@@ -3,14 +3,14 @@
   "sdk": 3,
   "brandColor": "#df2730",
 	"name": {
-		"en": "Yeelights",
-		"nl": "Yeelights"
+		"en": "Yeelights LAN",
+		"nl": "Yeelights LAN"
   },
   "tags": {
 		"en": [ "yeelight", "yeelights" ],
 		"nl": [ "yeelight", "yeelights" ]
 	},
-	"version": "3.0.10",
+	"version": "3.0.11",
 	"compatibility": ">=5.0.0",
 	"author": {
 		"name": "Jelger Haanstra",
@@ -36,8 +36,8 @@
   },
 	"category": "lights",
 	"description": {
-		"en": "Control Yeelights using Homey",
-		"nl": "Bedien Yeelights via Homey"
+		"en": "Control Yeelights using Homey over your local network (LAN)",
+		"nl": "Bedien Yeelights via Homey over your local network (LAN)"
 	},
 	"dependencies": {
 		"net": "*"
