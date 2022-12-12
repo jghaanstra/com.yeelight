@@ -1,0 +1,15 @@
+{
+  "driver": {
+    "yeelight_bulb_color": "Yeelight Bulb Kleur",
+    "yeelight_gu10": "Yeelight GU 10",
+    "yeelight_bulb_white": "Yeelight Bulb Wit",
+    "yeelight_led_strip": "Yeelight LED strip",
+    "yeelight_bedside_lamp": "Yeelight Nachtlamp",
+    "yeelight_ceiling_light": "Yeelight Plafondlamp",
+    "yeelight_meteorite_light": "Yeelight Meteorite Lamp",
+    "yeelight_desklamp": "Yeelight Bureau Lamp"
+  },
+  "device": {
+    "unreachable": "Yeelight is niet bereikbaar"
+  }
+}

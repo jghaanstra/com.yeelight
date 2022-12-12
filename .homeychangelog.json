@@ -61,5 +61,17 @@
   },
   "3.0.11": {
     "en": "Branding improvements, no functional changes."
+  },
+  "3.0.12": {
+    "en": "Support for model YLXD013-C (cielc)"
+  },
+  "3.0.13": {
+    "en": "Added support for model YLXD013-C (ceilc)"
+  },
+  "3.0.14": {
+    "en": "Code improvements for upcoming Homey Pro 2023, no functional changes."
+  },
+  "3.0.15": {
+    "en": "Code improvements for upcoming Homey Pro 2023, no functional changes."
   }
 }
