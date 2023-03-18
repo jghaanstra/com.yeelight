@@ -7,20 +7,19 @@ const Util = require('../../lib/util.js');
 
 class YeelightDevice extends Homey.Device {
 
-  onInit() {
+  async onInit() {
     if (!this.util) this.util = new Util({homey: this.homey});
 
     /* update the paired devices list when a device is initialized */
-    setTimeout(async () => { await this.util.fillAddedDevices(); }, 2000);
+    this.homey.setTimeout(async () => { await this.util.fillAddedDevices(); }, 2000);
 
     this.data = this.getData();
     this.socket = null;
-    this.timeout = null;
     this.reconnect = null;
     this.connecting = false;
     this.connected = false;
 
-    this.setAvailable();
+    await this.setAvailable();
     this.createDeviceSocket();
 
     // LISTENERS FOR UPDATING CAPABILITIES
@@ -173,9 +172,25 @@ class YeelightDevice extends Homey.Device {
 
   }
 
-  onDeleted() {
-    if (this.socket) {
-      this.socket.destroy();
+  async onDeleted() {
+    try {
+      this.homey.clearTimeout(this.reconnect);
+      if (this.socket) {
+        this.socket.destroy();
+      }
+    } catch (error) {
+      this.error(error);
+    }
+  }
+
+  async onUninit() {
+    try {
+      this.homey.clearTimeout(this.reconnect);
+      if (this.socket) {
+        this.socket.destroy();
+      }
+    } catch (error) {
+      this.error(error);
     }
   }
 
@@ -198,16 +213,14 @@ class YeelightDevice extends Homey.Device {
   		this.log("Yeelight - error creating socket: " + error);
   	}
 
-    this.socket.on('connect', () => {
+    this.socket.on('connect', async () => {
       this.connecting = false;
       this.connected = true;
 
-      if (!this.getAvailable()) {
-        this.setAvailable();
-      }
+      if (!this.getAvailable()) { await this.setAvailable(); }
 
       /* get current light status 4 seconds after connection */
-      setTimeout(() => {
+      this.homey.setTimeout(() => {
         if (this.socket !== null) {
           this.socket.write('{"id":1,"method":"get_prop","params":["power", "bright", "color_mode", "ct", "rgb", "hue", "sat"]}' + '\r\n');
         }
@@ -231,7 +244,7 @@ class YeelightDevice extends Homey.Device {
       }
 
       if (this.reconnect === null) {
-        this.reconnect = setTimeout(() => {
+        this.reconnect = this.homey.setTimeout(() => {
           if (typeof this.connecting !== "undefined" && typeof this.connected !== "undefined") {
             if (this.connecting === false && this.connected === false) {
               this.createDeviceSocket();
@@ -242,21 +255,18 @@ class YeelightDevice extends Homey.Device {
       }
     });
 
-    this.socket.on('close', (had_error) => {
+    this.socket.on('close', async (had_error) => {
       this.connecting = false;
       this.connected = false;
       this.socket = null;
-      this.setUnavailable(this.homey.__('device.unreachable'));
+      await this.setUnavailable(this.homey.__('device.unreachable'));
     });
 
-    this.socket.on('data', (message, address) => {
-      clearTimeout(this.timeout);
-      clearTimeout(this.reconnect);
+    this.socket.on('data', async (message, address) => {
+      this.homey.clearTimeout(this.reconnect);
       this.reconnect = null;
 
-      if(!this.getAvailable()) {
-        this.setAvailable();
-      }
+      if(!this.getAvailable()) { await this.setAvailable(); }
 
       var parsed_message = message.toString().replace(/{"id":1, "result":\["ok"\]}/g, '').replace(/{"id":1,"result":\["ok"\]}/g, '').replace(/\r\n/g,'');
 
@@ -279,9 +289,11 @@ class YeelightDevice extends Homey.Device {
                 }
                 break;
               case 'bg_power':
-                let bg_power = result.params.bg_power === 'on' ? true : false;
-                if (this.getCapabilityValue('onoff.bg') !== bg_power) {
-                  this.setCapabilityValue('onoff.bg', bg_power);
+                if (this.hasCapability('onoff.bg')) {
+                  let bg_power = result.params.bg_power === 'on' ? true : false;
+                  if (this.getCapabilityValue('onoff.bg') !== bg_power) {
+                    this.setCapabilityValue('onoff.bg', bg_power);
+                  }
                 }
                 break;
               case 'bright':
@@ -297,9 +309,11 @@ class YeelightDevice extends Homey.Device {
                 }
                 break;
               case 'bg_bright':
-                var dim_bg = result.params.bg_bright / 100;
-                if (this.getCapabilityValue('dim.bg') !== dim_bg) {
-                  this.setCapabilityValue('dim.bg', dim_bg);
+                if (this.hasCapability('dim.bg')) {
+                  var dim_bg = result.params.bg_bright / 100;
+                  if (this.getCapabilityValue('dim.bg') !== dim_bg) {
+                    this.setCapabilityValue('dim.bg', dim_bg);
+                  }
                 }
                 break;
               case 'ct':
@@ -311,16 +325,16 @@ class YeelightDevice extends Homey.Device {
                   var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 2700, 6500), 0, 1);
                 }
                 if (this.hasCapability('light_temperature')) {
-                  if (this.getCapabilityValue('light_temperature') !== color_temp) {
-                    this.setCapabilityValue('light_temperature', color_temp);
+                  if (this.getCapabilityValue('light_temperature') !== this.util.clamp(color_temp, 0, 1)) {
+                    this.setCapabilityValue('light_temperature', this.util.clamp(color_temp, 0, 1));
                   }
                 }
                 break;
               case 'bg_ct':
                 var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 2700, 6500), 0, 1);
                 if (this.hasCapability('light_temperature.bg')) {
-                  if (this.getCapabilityValue('light_temperature.bg') !== color_temp) {
-                    this.setCapabilityValue('light_temperature.bg', color_temp);
+                  if (this.getCapabilityValue('light_temperature.bg') !== this.util.clamp(color_temp, 0, 1)) {
+                    this.setCapabilityValue('light_temperature.bg', this.util.clamp(color_temp, 0, 1));
                   }
                 }
                 break;
@@ -330,8 +344,8 @@ class YeelightDevice extends Homey.Device {
                 var hue = Number((hsv.h / 359).toFixed(2));
                 var saturation = Number(hsv.s.toFixed(2));
                 if (this.hasCapability('light_hue') && this.hasCapability('light_saturation')) {
-                  if (this.getCapabilityValue('light_hue') !== hue) {
-                    this.setCapabilityValue('light_hue', hue);
+                  if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
+                    this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
                   }
                   if (this.getCapabilityValue('light_saturation') !== saturation) {
                     this.setCapabilityValue('light_saturation', saturation);
@@ -344,8 +358,8 @@ class YeelightDevice extends Homey.Device {
                 var rgb_hue = Number((rgb_hsv.h / 359).toFixed(2));
                 var rgb_saturation = Number(rgb_hsv.s.toFixed(2));
                 if (this.hasCapability('light_hue') && this.hasCapability('light_saturation')) {
-                  if (this.getCapabilityValue('light_hue') !== rgb_hue) {
-                    this.setCapabilityValue('light_hue', rgb_hue);
+                  if (this.getCapabilityValue('light_hue') !== this.util.clamp(rgb_hue, 0, 1)) {
+                    this.setCapabilityValue('light_hue', this.util.clamp(rgb_hue, 0, 1));
                   }
                   if (this.getCapabilityValue('light_saturation') !== rgb_saturation) {
                     this.setCapabilityValue('light_saturation', rgb_saturation);
@@ -355,16 +369,16 @@ class YeelightDevice extends Homey.Device {
               case 'hue':
                 var hue = result.params.hue / 359;
                 if (this.hasCapability('light_hue')) {
-                  if (this.getCapabilityValue('light_hue') !== hue) {
-                    this.setCapabilityValue('light_hue', hue);
+                  if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
+                    this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
                   }
                 }
                 break;
               case 'bg_hue':
                 var bg_hue = result.params.bg_hue / 359;
                 if (this.hasCapability('light_hue')) {
-                  if (this.getCapabilityValue('light_hue') !== bg_hue) {
-                    this.setCapabilityValue('light_hue', bg_hue);
+                  if (this.getCapabilityValue('light_hue') !== this.util.clamp(bg_hue, 0, 1)) {
+                    this.setCapabilityValue('light_hue', this.util.clamp(bg_hue, 0, 1));
                   }
                 }
                 break;
@@ -460,13 +474,13 @@ class YeelightDevice extends Homey.Device {
               }
             }
             if (this.hasCapability('light_temperature')) {
-              if (this.getCapabilityValue('light_temperature') !== color_temp) {
-                this.setCapabilityValue('light_temperature', color_temp);
+              if (this.getCapabilityValue('light_temperature') !== this.util.clamp(color_temp, 0, 1)) {
+                this.setCapabilityValue('light_temperature', this.util.clamp(color_temp, 0, 1));
               }
             }
             if (this.hasCapability('light_hue')) {
-              if (this.getCapabilityValue('light_hue') !== hue) {
-                this.setCapabilityValue('light_hue', hue);
+              if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
+                this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
               }
             }
             if (this.hasCapability('light_saturation')) {
@@ -494,14 +508,6 @@ class YeelightDevice extends Homey.Device {
         return reject('Unable to send command because socket is not available');
     	} else {
         this.socket.write(command + '\r\n');
-        return resolve(true);
-
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => {
-          if (this.connected === true && this.socket !== null) {
-            this.socket.emit('error', new Error('Error sending command'));
-          }
-        }, 6000);
       }
     });
   }
