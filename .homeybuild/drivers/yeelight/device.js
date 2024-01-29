@@ -256,242 +256,250 @@ class YeelightDevice extends Homey.Device {
     });
 
     this.socket.on('close', async (had_error) => {
-      this.connecting = false;
-      this.connected = false;
-      this.socket = null;
-      await this.setUnavailable(this.homey.__('device.unreachable'));
+      try {
+        this.connecting = false;
+        this.connected = false;
+        this.socket = null;
+        await this.setUnavailable(this.homey.__('device.unreachable'));
+      } catch (error) {
+        this.error(error);
+      }
     });
 
     this.socket.on('data', async (message, address) => {
-      this.homey.clearTimeout(this.reconnect);
-      this.reconnect = null;
+      try {
+        this.homey.clearTimeout(this.reconnect);
+        this.reconnect = null;
 
-      if(!this.getAvailable()) { await this.setAvailable(); }
+        if(!this.getAvailable()) { await this.setAvailable(); }
 
-      var parsed_message = message.toString().replace(/{"id":1, "result":\["ok"\]}/g, '').replace(/{"id":1,"result":\["ok"\]}/g, '').replace(/\r\n/g,'');
+        var parsed_message = message.toString().replace(/{"id":1, "result":\["ok"\]}/g, '').replace(/{"id":1,"result":\["ok"\]}/g, '').replace(/\r\n/g,'');
 
-      if (parsed_message.includes('props')) {
-        try {
-          var result = JSON.parse(parsed_message);
+        if (parsed_message.includes('props')) {
+          try {
+            var result = JSON.parse(parsed_message);
 
-          for (const key in result.params) {
-            switch (key) {
-              case 'power':
-                let onoff = result.params.power === 'on' ? true : false;
-                if (this.getCapabilityValue('onoff') !== onoff) {
-                  this.setCapabilityValue('onoff', onoff);
-                }
-                break;
-              case 'main_power':
-                let main_power = result.params.main_power === 'on' ? true : false;
-                if (this.getCapabilityValue('onoff') !== main_power) {
-                  this.setCapabilityValue('onoff', main_power);
-                }
-                break;
-              case 'bg_power':
-                if (this.hasCapability('onoff.bg')) {
-                  let bg_power = result.params.bg_power === 'on' ? true : false;
-                  if (this.getCapabilityValue('onoff.bg') !== bg_power) {
-                    this.setCapabilityValue('onoff.bg', bg_power);
+            for (const key in result.params) {
+              switch (key) {
+                case 'power':
+                  let onoff = result.params.power === 'on' ? true : false;
+                  if (this.getCapabilityValue('onoff') !== onoff) {
+                    this.setCapabilityValue('onoff', onoff);
                   }
-                }
-                break;
-              case 'bright':
-                var dim = result.params.bright / 100;
-                if (this.getCapabilityValue('dim') !== dim) {
-                  this.setCapabilityValue('dim', dim);
-                }
-                break;
-              case 'active_bright':
-                var active_dim = result.params.active_bright / 100;
-                if (this.getCapabilityValue('dim') !== active_dim) {
-                  this.setCapabilityValue('dim', active_dim);
-                }
-                break;
-              case 'bg_bright':
-                if (this.hasCapability('dim.bg')) {
-                  var dim_bg = result.params.bg_bright / 100;
-                  if (this.getCapabilityValue('dim.bg') !== dim_bg) {
-                    this.setCapabilityValue('dim.bg', dim_bg);
+                  break;
+                case 'main_power':
+                  let main_power = result.params.main_power === 'on' ? true : false;
+                  if (this.getCapabilityValue('onoff') !== main_power) {
+                    this.setCapabilityValue('onoff', main_power);
                   }
-                }
-                break;
-              case 'ct':
-                if (this.getData().model === 'color' || this.getData().model === 'colorc') {
-                  var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 1700, 6500), 0, 1);
-                } else if (this.getData().model === 'lamp') {
-                  var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 2600, 5000), 0, 1);
-                } else {
-                  var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 2700, 6500), 0, 1);
-                }
-                if (this.hasCapability('light_temperature')) {
-                  if (this.getCapabilityValue('light_temperature') !== this.util.clamp(color_temp, 0, 1)) {
-                    this.setCapabilityValue('light_temperature', this.util.clamp(color_temp, 0, 1));
+                  break;
+                case 'bg_power':
+                  if (this.hasCapability('onoff.bg')) {
+                    let bg_power = result.params.bg_power === 'on' ? true : false;
+                    if (this.getCapabilityValue('onoff.bg') !== bg_power) {
+                      this.setCapabilityValue('onoff.bg', bg_power);
+                    }
                   }
-                }
-                break;
-              case 'bg_ct':
-                var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 2700, 6500), 0, 1);
-                if (this.hasCapability('light_temperature.bg')) {
-                  if (this.getCapabilityValue('light_temperature.bg') !== this.util.clamp(color_temp, 0, 1)) {
-                    this.setCapabilityValue('light_temperature.bg', this.util.clamp(color_temp, 0, 1));
-                  }
-                }
-                break;
-              case 'rgb':
-                var color = tinycolor(result.params.rgb.toString(16));
-                var hsv = color.toHsv();
-                var hue = Number((hsv.h / 359).toFixed(2));
-                var saturation = Number(hsv.s.toFixed(2));
-                if (this.hasCapability('light_hue') && this.hasCapability('light_saturation')) {
-                  if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
-                    this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
-                  }
-                  if (this.getCapabilityValue('light_saturation') !== saturation) {
-                    this.setCapabilityValue('light_saturation', saturation);
-                  }
-                }
-                break;
-              case 'bg_rgb':
-                var rgb_color = tinycolor(result.params.bg_rgb.toString(16));
-                var rgb_hsv = rgb_color.toHsv();
-                var rgb_hue = Number((rgb_hsv.h / 359).toFixed(2));
-                var rgb_saturation = Number(rgb_hsv.s.toFixed(2));
-                if (this.hasCapability('light_hue') && this.hasCapability('light_saturation')) {
-                  if (this.getCapabilityValue('light_hue') !== this.util.clamp(rgb_hue, 0, 1)) {
-                    this.setCapabilityValue('light_hue', this.util.clamp(rgb_hue, 0, 1));
-                  }
-                  if (this.getCapabilityValue('light_saturation') !== rgb_saturation) {
-                    this.setCapabilityValue('light_saturation', rgb_saturation);
-                  }
-                }
-                break;
-              case 'hue':
-                var hue = result.params.hue / 359;
-                if (this.hasCapability('light_hue')) {
-                  if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
-                    this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
-                  }
-                }
-                break;
-              case 'bg_hue':
-                var bg_hue = result.params.bg_hue / 359;
-                if (this.hasCapability('light_hue')) {
-                  if (this.getCapabilityValue('light_hue') !== this.util.clamp(bg_hue, 0, 1)) {
-                    this.setCapabilityValue('light_hue', this.util.clamp(bg_hue, 0, 1));
-                  }
-                }
-                break;
-              case 'sat':
-                var saturation = result.params.sat / 100;
-                if (this.hasCapability('light_saturation')) {
-                  if (this.getCapabilityValue('light_saturation') !== saturation) {
-                    this.setCapabilityValue('light_saturation', saturation);
-                  }
-                }
-                break;
-              case 'bg_sat':
-                var bg_saturation = result.params.bg_sat / 100;
-                if (this.hasCapability('light_saturation')) {
-                  if (this.getCapabilityValue('light_saturation') !== bg_saturation) {
-                    this.setCapabilityValue('light_saturation', bg_saturation);
-                  }
-                }
-                break;
-              case 'color_mode':
-                if (this.hasCapability('light_mode')) {
-                  if (result.params.color_mode === 2) {
-                    this.setCapabilityValue('light_mode', 'temperature');
-                  } else {
-                    this.setCapabilityValue('light_mode', 'color');
-                  }
-                }
-                break;
-              case 'bg_lmode':
-                if (this.hasCapability('light_mode.bg')) {
-                  if (result.params.bg_lmode === 2) {
-                    this.setCapabilityValue('light_mode.bg', 'temperature');
-                  } else {
-                    this.setCapabilityValue('light_mode.bg', 'color');
-                  }
-                }
-                break;
-              case 'nl_br':
-                if (result.params.nl_br !== 0) {
-                  var dim = result.params.nl_br / 100;
+                  break;
+                case 'bright':
+                  var dim = result.params.bright / 100;
                   if (this.getCapabilityValue('dim') !== dim) {
                     this.setCapabilityValue('dim', dim);
                   }
-                }
-                if (this.hasCapability('night_mode')) {
-                  if (result.params.active_mode == 0 && this.getCapabilityValue('night_mode') === true) {
-                    this.setCapabilityValue('night_mode', false);
-                  } else if (result.params.active_mode !== 0 && this.getCapabilityValue('night_mode') === false) {
-                    this.setCapabilityValue('night_mode', true);
+                  break;
+                case 'active_bright':
+                  var active_dim = result.params.active_bright / 100;
+                  if (this.getCapabilityValue('dim') !== active_dim) {
+                    this.setCapabilityValue('dim', active_dim);
                   }
+                  break;
+                case 'bg_bright':
+                  if (this.hasCapability('dim.bg')) {
+                    var dim_bg = result.params.bg_bright / 100;
+                    if (this.getCapabilityValue('dim.bg') !== dim_bg) {
+                      this.setCapabilityValue('dim.bg', dim_bg);
+                    }
+                  }
+                  break;
+                case 'ct':
+                  if (this.getData().model === 'color' || this.getData().model === 'colorc') {
+                    var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 1700, 6500), 0, 1);
+                  } else if (this.getData().model === 'lamp') {
+                    var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 2600, 5000), 0, 1);
+                  } else {
+                    var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 2700, 6500), 0, 1);
+                  }
+                  if (this.hasCapability('light_temperature')) {
+                    if (this.getCapabilityValue('light_temperature') !== this.util.clamp(color_temp, 0, 1)) {
+                      this.setCapabilityValue('light_temperature', this.util.clamp(color_temp, 0, 1));
+                    }
+                  }
+                  break;
+                case 'bg_ct':
+                  var color_temp = this.util.clamp(1 - this.util.normalize(result.params.ct, 2700, 6500), 0, 1);
+                  if (this.hasCapability('light_temperature.bg')) {
+                    if (this.getCapabilityValue('light_temperature.bg') !== this.util.clamp(color_temp, 0, 1)) {
+                      this.setCapabilityValue('light_temperature.bg', this.util.clamp(color_temp, 0, 1));
+                    }
+                  }
+                  break;
+                case 'rgb':
+                  var color = tinycolor(result.params.rgb.toString(16));
+                  var hsv = color.toHsv();
+                  var hue = Number((hsv.h / 359).toFixed(2));
+                  var saturation = Number(hsv.s.toFixed(2));
+                  if (this.hasCapability('light_hue') && this.hasCapability('light_saturation')) {
+                    if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
+                      this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
+                    }
+                    if (this.getCapabilityValue('light_saturation') !== saturation) {
+                      this.setCapabilityValue('light_saturation', saturation);
+                    }
+                  }
+                  break;
+                case 'bg_rgb':
+                  var rgb_color = tinycolor(result.params.bg_rgb.toString(16));
+                  var rgb_hsv = rgb_color.toHsv();
+                  var rgb_hue = Number((rgb_hsv.h / 359).toFixed(2));
+                  var rgb_saturation = Number(rgb_hsv.s.toFixed(2));
+                  if (this.hasCapability('light_hue') && this.hasCapability('light_saturation')) {
+                    if (this.getCapabilityValue('light_hue') !== this.util.clamp(rgb_hue, 0, 1)) {
+                      this.setCapabilityValue('light_hue', this.util.clamp(rgb_hue, 0, 1));
+                    }
+                    if (this.getCapabilityValue('light_saturation') !== rgb_saturation) {
+                      this.setCapabilityValue('light_saturation', rgb_saturation);
+                    }
+                  }
+                  break;
+                case 'hue':
+                  var hue = result.params.hue / 359;
+                  if (this.hasCapability('light_hue')) {
+                    if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
+                      this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
+                    }
+                  }
+                  break;
+                case 'bg_hue':
+                  var bg_hue = result.params.bg_hue / 359;
+                  if (this.hasCapability('light_hue')) {
+                    if (this.getCapabilityValue('light_hue') !== this.util.clamp(bg_hue, 0, 1)) {
+                      this.setCapabilityValue('light_hue', this.util.clamp(bg_hue, 0, 1));
+                    }
+                  }
+                  break;
+                case 'sat':
+                  var saturation = result.params.sat / 100;
+                  if (this.hasCapability('light_saturation')) {
+                    if (this.getCapabilityValue('light_saturation') !== saturation) {
+                      this.setCapabilityValue('light_saturation', saturation);
+                    }
+                  }
+                  break;
+                case 'bg_sat':
+                  var bg_saturation = result.params.bg_sat / 100;
+                  if (this.hasCapability('light_saturation')) {
+                    if (this.getCapabilityValue('light_saturation') !== bg_saturation) {
+                      this.setCapabilityValue('light_saturation', bg_saturation);
+                    }
+                  }
+                  break;
+                case 'color_mode':
+                  if (this.hasCapability('light_mode')) {
+                    if (result.params.color_mode === 2) {
+                      this.setCapabilityValue('light_mode', 'temperature');
+                    } else {
+                      this.setCapabilityValue('light_mode', 'color');
+                    }
+                  }
+                  break;
+                case 'bg_lmode':
+                  if (this.hasCapability('light_mode.bg')) {
+                    if (result.params.bg_lmode === 2) {
+                      this.setCapabilityValue('light_mode.bg', 'temperature');
+                    } else {
+                      this.setCapabilityValue('light_mode.bg', 'color');
+                    }
+                  }
+                  break;
+                case 'nl_br':
+                  if (result.params.nl_br !== 0) {
+                    var dim = result.params.nl_br / 100;
+                    if (this.getCapabilityValue('dim') !== dim) {
+                      this.setCapabilityValue('dim', dim);
+                    }
+                  }
+                  if (this.hasCapability('night_mode')) {
+                    if (result.params.active_mode == 0 && this.getCapabilityValue('night_mode') === true) {
+                      this.setCapabilityValue('night_mode', false);
+                    } else if (result.params.active_mode !== 0 && this.getCapabilityValue('night_mode') === false) {
+                      this.setCapabilityValue('night_mode', true);
+                    }
+                  }
+                  break;
+                default:
+                  break;
+              }
+            }
+
+          } catch (error) {
+            this.log('Unable to process message because of error: '+ error);
+          }
+        } else if (parsed_message.includes('result')) {
+          try {
+            var result = JSON.parse(parsed_message);
+
+            if (result.result[0] != "ok") {
+              var dim = result.result[1] / 100;
+              var hue = result.result[5] / 359;
+              var saturation = result.result[6] / 100;
+              if (this.getData().model === 'color') {
+                var color_temp = this.util.normalize(result.result[3], 1700, 6500);
+              } else if (this.getData().model === 'lamp') {
+                var color_temp = this.util.normalize(result.result[3], 2600, 5000);
+              } else {
+                var color_temp = this.util.normalize(result.result[3], 2700, 6500);
+              }
+              if(result.result[2] == 2) {
+                var color_mode = 'temperature';
+              } else {
+                var color_mode = 'color';
+              }
+
+              if(result.result[0] === 'on' && this.getCapabilityValue('onoff') !== true) {
+                this.setCapabilityValue('onoff', true);
+              } else if (result.result[0] === 'off' && this.getCapabilityValue('onoff') !== false) {
+                this.setCapabilityValue('onoff', false);
+              }
+              if (this.getCapabilityValue('dim') !== dim) {
+                this.setCapabilityValue('dim', dim);
+              }
+              if (this.hasCapability('light_mode')) {
+                if (this.getCapabilityValue('light_mode') !== color_mode) {
+                  this.setCapabilityValue('light_mode', color_mode);
                 }
-                break;
-              default:
-                break;
+              }
+              if (this.hasCapability('light_temperature')) {
+                if (this.getCapabilityValue('light_temperature') !== this.util.clamp(color_temp, 0, 1)) {
+                  this.setCapabilityValue('light_temperature', this.util.clamp(color_temp, 0, 1));
+                }
+              }
+              if (this.hasCapability('light_hue')) {
+                if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
+                  this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
+                }
+              }
+              if (this.hasCapability('light_saturation')) {
+                if (this.getCapabilityValue('light_saturation') !== saturation) {
+                  this.setCapabilityValue('light_saturation', saturation);
+                }
+              }
             }
+          } catch (error) {
+            this.log('Unable to process message because of error: '+ error);
           }
-
-        } catch (error) {
-          this.log('Unable to process message because of error: '+ error);
         }
-      } else if (parsed_message.includes('result')) {
-        try {
-          var result = JSON.parse(parsed_message);
-
-          if (result.result[0] != "ok") {
-            var dim = result.result[1] / 100;
-            var hue = result.result[5] / 359;
-            var saturation = result.result[6] / 100;
-            if (this.getData().model === 'color') {
-              var color_temp = this.util.normalize(result.result[3], 1700, 6500);
-            } else if (this.getData().model === 'lamp') {
-              var color_temp = this.util.normalize(result.result[3], 2600, 5000);
-            } else {
-              var color_temp = this.util.normalize(result.result[3], 2700, 6500);
-            }
-            if(result.result[2] == 2) {
-              var color_mode = 'temperature';
-            } else {
-              var color_mode = 'color';
-            }
-
-            if(result.result[0] === 'on' && this.getCapabilityValue('onoff') !== true) {
-              this.setCapabilityValue('onoff', true);
-            } else if (result.result[0] === 'off' && this.getCapabilityValue('onoff') !== false) {
-              this.setCapabilityValue('onoff', false);
-            }
-            if (this.getCapabilityValue('dim') !== dim) {
-              this.setCapabilityValue('dim', dim);
-            }
-            if (this.hasCapability('light_mode')) {
-              if (this.getCapabilityValue('light_mode') !== color_mode) {
-                this.setCapabilityValue('light_mode', color_mode);
-              }
-            }
-            if (this.hasCapability('light_temperature')) {
-              if (this.getCapabilityValue('light_temperature') !== this.util.clamp(color_temp, 0, 1)) {
-                this.setCapabilityValue('light_temperature', this.util.clamp(color_temp, 0, 1));
-              }
-            }
-            if (this.hasCapability('light_hue')) {
-              if (this.getCapabilityValue('light_hue') !== this.util.clamp(hue, 0, 1)) {
-                this.setCapabilityValue('light_hue', this.util.clamp(hue, 0, 1));
-              }
-            }
-            if (this.hasCapability('light_saturation')) {
-              if (this.getCapabilityValue('light_saturation') !== saturation) {
-                this.setCapabilityValue('light_saturation', saturation);
-              }
-            }
-          }
-        } catch (error) {
-          this.log('Unable to process message because of error: '+ error);
-        }
+      } catch (error) {
+        this.error(error);
       }
   	});
   }
@@ -508,6 +516,7 @@ class YeelightDevice extends Homey.Device {
         return reject('Unable to send command because socket is not available');
     	} else {
         this.socket.write(command + '\r\n');
+        return resolve(true);
       }
     });
   }
