@@ -5,11 +5,13 @@ const Util = require('../../lib/util.js');
 
 const typeCapabilityMap = {
 	'mono'      : [ 'onoff', 'dim' ],
-  'ct'        : [ 'onoff', 'dim', 'light_temperature' ],
-	'color'     : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
+  'mono1'      : [ 'onoff', 'dim' ],
+  'color'     : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'colorc'    : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'stripe'    : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
+  'ct'        : [ 'onoff', 'dim', 'light_temperature' ],  
   'bslamp'    : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
+  'bslamp1'    : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'bslamp2'   : [ 'onoff', 'dim', 'light_hue', 'light_saturation', 'light_temperature', 'light_mode' ],
   'ceiling'   : [ 'onoff', 'dim', 'light_temperature', 'light_mode', 'night_mode' ],
   'ceiling4'  : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
@@ -19,7 +21,8 @@ const typeCapabilityMap = {
   'ceiling15' : [ 'onoff', 'dim', 'light_temperature', 'light_mode', 'night_mode' ],
   'ceiling20' : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ],
   'desklamp'  : [ 'onoff', 'dim', 'light_temperature' ],
-  'lamp'      : [ 'onoff', 'dim', 'light_temperature' ]
+  'lamp'      : [ 'onoff', 'dim', 'light_temperature' ],
+  'lamp15'      : [ 'onoff', 'onoff.bg', 'dim', 'dim.bg', 'light_hue', 'light_saturation', 'light_temperature', 'light_temperature.bg', 'light_mode', 'light_mode.bg', 'night_mode' ]
 }
 
 const typeIconMap = {
@@ -27,8 +30,8 @@ const typeIconMap = {
 	'color'     : 'bulb.svg',
   'colorc'    : 'gu10.svg',
   'stripe'    : 'strip.svg',
-  'stripe1'   : 'strip.svg',
   'bslamp'    : 'bslamp.svg',
+  'bslamp1'    : 'bslamp.svg',
   'bslamp2'   : 'bslamp2.svg',
   'ceiling'   : 'ceiling.svg',
   'ceiling4'  : 'ceiling4.svg',
@@ -38,7 +41,8 @@ const typeIconMap = {
   'ceiling15' : 'ceiling4.svg',
   'ceiling20' : 'ceiling4.svg',
   'desklamp'  : 'desklamp.svg',
-  'lamp'      : 'desklamp.svg'
+  'lamp'      : 'desklamp.svg',
+  'lamp15'    : 'desklamp.svg'
 }
 
 class YeelightDriver extends Homey.Driver {
@@ -113,7 +117,11 @@ class YeelightDriver extends Homey.Driver {
           var model = 'desklamp';
         } else if (result[i].model.startsWith('lamp')) {
           var name = this.homey.__('yeelight_desklamp')+ ' (' + result[i].address + ')';
-          var model = 'lamp';
+          if (result[i].model == 'lamp15') {
+            var model = result[i].model;
+          } else {
+            var model = 'lamp';
+          }
         } else {
           var name = 'Unknown model'+ ' (' + result[i].model + ')';
           var model = 'ceiling';

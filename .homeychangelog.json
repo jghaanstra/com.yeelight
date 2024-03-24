@@ -79,5 +79,8 @@
   },
   "3.0.17": {
     "en": "This release contains some minor code improvements, no functional changes."
+  },
+  "3.0.18": {
+    "en": "Support for Yeelight Screen Bar Pro."
   }
 }
